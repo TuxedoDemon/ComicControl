@@ -86,9 +86,7 @@ class CC_User{
 		global $tableprefix;
 		
 		//handle case if user is trying to log in from comiccontrol/login.php
-		if(isset($_POST['username']))
-		{
-			
+		if(isset($_POST['username'])){
 			//assign inputs
 			$password = $_POST['password'];
 			$username = $_POST['username'];
@@ -99,47 +97,33 @@ class CC_User{
 			$userinfo = $stmt->fetch();
 			
 			if($userinfo['username'] != ""){
-				
 				//if username is found, check the user's password
 				$stmt = $cc->prepare("SELECT * FROM cc_" . $tableprefix . "users WHERE username=:username AND password=:password LIMIT 1");
 				$stmt->execute(['username' => $username,'password' => md5($password . $userinfo['salt'])]);
 				$userinfo = $stmt->fetch();
-				
 				//if password checks out, log in the user
 				if($userinfo['username'] != ""){
-					
 					$this->loginuser($userinfo);
-					
 				}
 			}
-		}
-		
-		//if the user has a login cookie, check it
-		else if(isset($_COOKIE['username']) && isset($_COOKIE['loginhash']) && isset($_COOKIE['hashtime'])){
-			
-			
+		}else if(isset($_COOKIE['username']) && isset($_COOKIE['loginhash']) && isset($_COOKIE['hashtime'])){ //if the user has a login cookie, check it
 			//assign inputs
 			$loginhash = $_COOKIE['loginhash'];
 			$username = $_COOKIE['username'];
-			
 			//check to see if the username is in the database
 			$stmt = $cc->prepare("SELECT * FROM cc_" . $tableprefix . "users WHERE username=:username LIMIT 1");
 			$stmt->execute(['username' => $username]);
 			$userinfo = $stmt->fetch();
 			
 			if($userinfo['username'] != ""){
-				
 				//if user is found, check the loginhash against the database
 				$stmt = $cc->prepare("SELECT * FROM cc_" . $tableprefix . "sessions WHERE userid=:id AND loginhash=:loginhash LIMIT 1");
 				$sessionhash = (sha1($userinfo['username'] . $userinfo['salt'] . $loginhash));
 				$stmt->execute(['id' => $userinfo['id'], 'loginhash' => $sessionhash]);
 				$sessioninfo = $stmt->fetch();
 				
-				if($sessioninfo['loginhash'] != ""){
-					
-					//if info checks out, log them in
+				if($sessioninfo['loginhash'] != ""){ //if info checks out, log them in
 					$this->loginuser($userinfo,$loginhash,$sessionhash);
-					
 				}
 			}
 		}
@@ -186,14 +170,14 @@ class CC_User{
 	
 	public function showAvatar(){
 		
-			global $ccsite;
-			$avatar = $this->avatar;
+		global $ccsite;
+		$avatar = $this->avatar;
 		
 		if($avatar == ""){
 			$avatar = "default.png";
 		}
 		
-		echo '<img src="' . $ccsite->root . $ccsite->ccroot . 'avatars/' . $avatar . '" />';
+		echo '<img src="' . $ccsite->root . $ccsite->ccroot . 'avatars/' . $avatar . '">';
 	}
 }
 
@@ -233,8 +217,7 @@ class CC_Page{
 				unset($this->slugarr[$key]);
 			}
 		}
-		
-		//check if it's the index page
+			//check if it's the index page
 		$this->isindex = (count($this->slugarr)==0) ? true : false;
 		switch($this->slugarr[0]){
 			case "index.php":
@@ -250,8 +233,7 @@ class CC_Page{
 			default:
 				$this->isindex = false;
 		}
-		
-		//fill in variables based on what's in slugarr and who we're showing it to (admin or user)
+			//fill in variables based on what's in slugarr and who we're showing it to (admin or user)
 		if(!$this->isindex){
 			if($end == "admin"){
 				$this->slug = toSlug($this->slugarr[2]);
@@ -266,8 +248,7 @@ class CC_Page{
 				}
 			}
 		}
-		
-		//get page information from the database
+			//get page information from the database
 		if($this->isindex){
 			$stmt = $cc->prepare("SELECT * FROM cc_" . $ccsite->tableprefix . "options WHERE optionname='homepage' LIMIT 1");
 			$stmt->execute();
@@ -280,8 +261,7 @@ class CC_Page{
 			$stmt->execute(['slug' => $this->slug]);
 			$page = $stmt->fetch();
 		}
-		
-		//if the page wasn't found, just get the main page
+			//if the page wasn't found, just get the main page
 		if($page['title'] == ""){
 			$stmt = $cc->prepare("SELECT * FROM cc_" . $ccsite->tableprefix . "options WHERE optionname='homepage' LIMIT 1");
 			$stmt->execute();
@@ -290,8 +270,7 @@ class CC_Page{
 			$stmt->execute(['id' => $mainpage['optionvalue']]);
 			$page = $stmt->fetch();
 		}
-		
-		//set variables based on info pulled from the database
+			//set variables based on info pulled from the database
 		$this->id = $page['id'];
 		$this->title = $page['title'];
 		$this->moduletype = $page['moduletype'];
@@ -402,6 +381,7 @@ class CC_Page{
 			}
 		}
 	}
+
 	public function displayMeta(){
 		
 		global $ccsite;
@@ -418,7 +398,6 @@ class CC_Page{
 
 //CC_Module - a basic class for real modules to be built on.  Not meant for use by itself.
 class CC_Module{
-	
 	//a function to fetch the options for the given module
 	public function getOptions($moduleinfo){
 		
@@ -499,40 +478,36 @@ class CC_Text extends CC_Module{
 	public $name; //module name
 	public $type = "text"; //module type
 	public $slug = "slug"; //module slug
-	
 	public $content = ""; //text content
 	public $options; //module options
 	
-	//constructor gets any relevant options and the title and content.
-	public function __construct($moduleinfo){
-		
-		global $cc;
-		global $tableprefix;
-		
-		//set basic variables from given info
-		$this->id = $moduleinfo['id'];
-		$this->name = $moduleinfo['title'];
-		$this->slug = $moduleinfo['slug'];
-		
-		//get text content and title from database
-		$stmt = $cc->prepare("SELECT * FROM cc_" . $tableprefix . "text WHERE id=:id LIMIT 1");
-		$stmt->execute(['id' => $moduleinfo['id']]);
-		$text = $stmt->fetch();
-		if(is_array($text)){
-			$this->content = $text['content'];
+		//constructor gets any relevant options and the title and content.
+		public function __construct($moduleinfo){
+			
+				global $cc;
+				global $tableprefix;
+					//set basic variables from given info
+				$this->id = $moduleinfo['id'];
+				$this->name = $moduleinfo['title'];
+				$this->slug = $moduleinfo['slug'];
+				//get text content and title from database
+			$stmt = $cc->prepare("SELECT * FROM cc_" . $tableprefix . "text WHERE id=:id LIMIT 1");
+			$stmt->execute(['id' => $moduleinfo['id']]);
+			$text = $stmt->fetch();
+			if(is_array($text)){
+				$this->content = $text['content'];
+			}
+				//get the options
+			$this->options = $this->getOptions($moduleinfo);
 		}
-		
-		//get the options
-		$this->options = $this->getOptions($moduleinfo);
-		
-	}
 	
-	//display the text.
+		//display the text.
 	public function display(){
-		if($this->options['showTitle'] == "on") echo '<h1 class="cc-title">' . $this->name . '</h1>';
+		if($this->options['showTitle'] == "on"){
+			echo '<h1 class="cc-title">' . $this->name . '</h1>';
+		}
 		echo $this->content;
 	}
-	
 }
 
 //CC_Comic - contains all the information for a given comic and also functions for displaying and navigating through a comic
@@ -560,22 +535,20 @@ class CC_Comic extends CC_Module{
 		global $ccsite;
 		global $ccpage;
 		global $user_lang;
-		
-		//get the current comic
+			//get the current comic
 		$comic = $this->getComic();
 
 		function tagAdd(){ //adds tags 
+				  
 			$tagadd = "";
 			
 		        if(($ccpage->slugarr[2] ?? "") == "read-tag"){
 				$tagadd = "/read-tag/" . $ccpage->slugarr[3];
 			}
-
 			return $tagadd;
 		}
 		
-		echo '<div id="cc-comicbody">';
-		
+	echo '<div id="cc-comicbody">';
 		if(isset($comic['title'])){
 			if($comic['mime'] == "application/x-shockwave-flash"){ //handle displaying swf comics
 				echo '<div id="cc-comic" style="height:' . $comic['height'] . 'px; width:' . $comic['width'] . 'px; display:inline-block;">';
@@ -599,16 +572,14 @@ class CC_Comic extends CC_Module{
 				if($comic != $this->getSeq("last") || $comic['altnext'] != ""){
 					echo '</a>';
 				}
-
-			      	echo $this->comicJavascript($comic);
+			      
+				echo $this->comicJavascript($comic);
 			}
-			
 				//insert arrow key navigation if included
-			if($this->options['arrowkey'] == "on"){ //check to add tag reading portion of URL
-		                echo tagAdd();
-		                	
+			if($this->options['arrowkey'] == "on"){ 
 		                $firstcomic = $this->getSeq("first");	//get the first and last comic
 		                $lastcomic = $this->getSeq("last");
+				echo tagAdd(); //check to add tag reading portion of URL
 		                
 		                if($firstcomic['id'] == $comic['id']){
 		                	$prevslug = $comic['slug'];
@@ -693,7 +664,7 @@ class CC_Comic extends CC_Module{
 			$contentWarnings = str_replace('"', '&quot;', $comic['contentwarning']);
 				//self-note: fix the self-closing <br> thing and make the content warning text easier to style
 			$script = '
-	   <script>
+   	<script>
 		const contentwarningtext = "' . $contentWarnings . $user_lang['<br />Click to view this page'] .'";
 		
 		$(\'#cc-comicbody img\').addClass(\'cc-blur\');
