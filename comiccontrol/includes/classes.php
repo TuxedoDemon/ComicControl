@@ -753,7 +753,7 @@ class CC_Comic extends CC_Module{
 
 		foreach($javascript as $key => $value){
 			if(!strlen($value)){
-			   unset($javascript[$key];
+			   unset($javascript[$key]);
 			}
 		}
 
