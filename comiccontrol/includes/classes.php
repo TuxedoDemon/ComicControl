@@ -152,32 +152,25 @@ class CC_User{
 		global $tableprefix;
 		
 		//create login if not logged in
-		if($loginhash == 0){
-		
-			//create the user-end hash
+		if($loginhash == 0){//create the user-end hash
 			$characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
 			$loginhash = '';
+				    
 			for ($i = 0; $i < 32; $i++) {
 			  $loginhash .= $characters[rand(0, strlen($characters) - 1)];
-			}
-			
-			//create the server-end hash and put it in the database if not already logged in
+			}   
+				//create the server-end hash and put it in the database if not already logged in
 			$sessionhash =  sha1($userinfo['username'] . $userinfo['salt'] . $loginhash);
 			$stmt = $cc->prepare("INSERT INTO cc_" . $tableprefix . "sessions(userid, loginhash, loginexpire) VALUES(:userid,:loginhash,:expire)");
 			$stmt->execute(['userid' => $userinfo['id'], 'loginhash' => $sessionhash, 'expire' => time() + (432000) ]);
-		
-		}
-		
-		//update login if still logged in
-		else{
+		}else{	//update login if still logged in
 			$stmt = $cc->prepare("UPDATE cc_" . $tableprefix . "sessions SET loginexpire=:expire WHERE userid=:userid AND loginhash=:loginhash LIMIT 1");
 			$stmt->execute(['userid' => $userinfo['id'], 'loginhash' => $sessionhash, 'expire' => time() + (432000) ]);
 		}
-		
 		//set the user cookie
-		setcookie('loginhash', $loginhash, time() + (432000), "/", $_SERVER['HTTP_HOST']);
-		setcookie('username', $userinfo['username'], time() + (432000), "/", $_SERVER['HTTP_HOST']);
-		setcookie('hashtime', time(), time() + (432000), "/", $_SERVER['HTTP_HOST']);
+		setcookie('loginhash', $loginhash, time() + (432000), "/", $_SERVER['HTTP_HOST'], 1, 1);
+		setcookie('username', $userinfo['username'], time() + (432000), "/", $_SERVER['HTTP_HOST'], 1, 1);
+		setcookie('hashtime', time(), time() + (432000), "/", $_SERVER['HTTP_HOST'], 1, 1);
 		
 		//set that info within the object
 		$this->id = $userinfo['id'];
@@ -186,17 +179,21 @@ class CC_User{
 		$this->authlevel = $userinfo['authlevel'];
 		$this->avatar = $userinfo['avatar'];
 	}
+	
 	public function checkUser(){
 		echo $this->id . '<br />' . $this->username . '<br />' . $this->loginhash . '<br />' . $this->authlevel . '<br />' . $this->language;
 	}
+	
 	public function showAvatar(){
 		
-		global $ccsite;
+			global $ccsite;
+			$avatar = $this->avatar;
 		
-		$avatar = $this->avatar;
-		if($avatar == "") $avatar = "default.png";
+		if($avatar == ""){
+			$avatar = "default.png";
+		}
+		
 		echo '<img src="' . $ccsite->root . $ccsite->ccroot . 'avatars/' . $avatar . '" />';
-		
 	}
 }
 
@@ -232,15 +229,27 @@ class CC_Page{
 		$this->slugarr = array();
 		$this->slugarr = explode("/",$slug);
 		foreach($this->slugarr as $key => $slug){
-			if($slug == ""){
+			if(empty($slug)){
 				unset($this->slugarr[$key]);
 			}
 		}
 		
 		//check if it's the index page
 		$this->isindex = (count($this->slugarr)==0) ? true : false;
-		if($this->slugarr[0] == "index.php") $this->isindex = true;
-		if((count($this->slugarr)==1) && $this->slugarr[0] == "") $this->isindex = true;
+		switch($this->slugarr[0]){
+			case "index.php":
+				$this->isindex = true;
+			break;
+			case empty($this->slugarr[0]):
+				switch(count($this->slugarr){
+					case 1:
+						$this->isindex = true;
+					break;
+				}
+			break;
+			default:
+				$this->isindex = false;
+		}
 		
 		//fill in variables based on what's in slugarr and who we're showing it to (admin or user)
 		if(!$this->isindex){
@@ -321,31 +330,26 @@ class CC_Page{
 		$moduleinfo = $stmt->fetch();
 		
 		//if the module was found, build the module
-		if($moduleinfo['id'] != ""){
-			
+		if(!empty($moduleinfo['id'])){
 			$module = null;
+			
 			switch($moduleinfo['moduletype']){
-				
 				case "text":
 					$module = new CC_Text($moduleinfo);
-					break;
+				break;
 				case "comic":
 					$module = new CC_Comic($moduleinfo);
-					break;
+				break;
 				case "blog":
 					$module = new CC_Blog($moduleinfo,$this->subslug);
-					break;
+				break;
 				case "gallery":
 					$module = new CC_Gallery($moduleinfo);
-					break;
-					
+				break;
 			}
-			return $module;
 			
-		}
-		
-		//if the module wasn't found, return null
-		else{
+			return $module;
+		}else{ //if the module wasn't found, return null
 			return null;
 		}
 		
@@ -435,7 +439,6 @@ class CC_Module{
 		}
 
 		return $options;
-		
 	}
 	
 	//function to build navigation text at the bottom of search/archive pages
@@ -446,49 +449,47 @@ class CC_Module{
 		global $user_lang;
 		
 		$page = $ccpage->pagenum;
-		
-		//if there's no page set, make it page 1
-		if($page == "" || $page == 0) $page = 1;
-		
-		//building part of the URL that will be in the buttons; differs depending on the page that it's in
 		$pagedir = "page";
-		if($ccpage->subslug == "search"){
-			$pagedir = "search/" . $ccpage->searchterm;
-		}
 		
+			if(empty($page)){ //if there's no page set, make it page 1
+				$page = 1;
+			}
+		
+			if($ccpage->subslug == "search"){ //building part of the URL that will be in the buttons; differs depending on the page that it's in
+				$pagedir = "search/" . $ccpage->searchterm;
+			}
 		//output previous/next buttons for flipping through pages
 		echo '<div class="cc-prevnext">';
-		if($page > 1){
-			echo '<a href="' . $ccsite->root . $ccsite->relativeroot . $this->slug . '/' . $pagedir . '/' . ($page-1) . '">' . $user_lang['navprev'] . '</a>';
-		}
-		if($page < $numpages){
-			echo '<a href="' . $ccsite->root . $ccsite->relativeroot . $this->slug . '/' . $pagedir . '/' . ($page+1) . '">' . $user_lang['navnext'] . '</a>';
-		}
+			if($page > 1){
+				echo '<a href="' . $ccsite->root . $ccsite->relativeroot . $this->slug . '/' . $pagedir . '/' . ($page-1) . '">' . $user_lang['navprev'] . '</a>';
+			}
+			if($page < $numpages){
+				echo '<a href="' . $ccsite->root . $ccsite->relativeroot . $this->slug . '/' . $pagedir . '/' . ($page+1) . '">' . $user_lang['navnext'] . '</a>';
+			}
 		echo '</div>';
-		
-		//output page number string for jumping through pages
+			//output page number string for jumping through pages
 		$ellipsis1 = false;
 		$ellipsis2 = false;
+		
 		echo '<div class="cc-pagelist">' . $user_lang["Page"] . ' ';
-		for($i=1; $i<=$numpages; $i++){
-			if($i < $page-4 && $ellipsis1 == false){
-				echo '<a href="' . $ccsite->root . $this->slug . '/' . $pagedir . '/1">1 ...</a> ';
-				$ellipsis1 = true;
+			for($i=1; $i<=$numpages; $i++){
+				if($i < $page-4 && $ellipsis1 == false){
+					echo '<a href="' . $ccsite->root . $this->slug . '/' . $pagedir . '/1">1 ...</a> ';
+					$ellipsis1 = true;
+				}
+				if($page != $i && ($i >= $page-4 && $i < $page+4)){
+					echo '<a href="' . $ccsite->root . $this->slug . '/' . $pagedir .'/' . $i . '">' . $i . '</a> ';
+				}
+				if($page == $i){
+					echo $i . ' ';
+				}
+				if($i >= $page+4 && $ellipsis2 == false){
+					echo '<a href="' . $ccsite->root . $this->slug . '/' . $pagedir . '/' . $numpages . '">... ' . $numpages . '</a>';
+					$ellipsis2 = true;
+				}
 			}
-			if($page != $i && ($i >= $page-4 && $i < $page+4)){
-				echo '<a href="' . $ccsite->root . $this->slug . '/' . $pagedir .'/' . $i . '">' . $i . '</a> ';
-			}
-			if($page == $i){
-				echo $i . ' ';
-			}
-			if($i >= $page+4 && $ellipsis2 == false){
-				echo '<a href="' . $ccsite->root . $this->slug . '/' . $pagedir . '/' . $numpages . '">... ' . $numpages . '</a>';
-				$ellipsis2 = true;
-			}
-		}
 		echo '</div>';
 	}
-	
 }
 
 //CC_Text - basic text module. Basically holds just a title and a content area.
@@ -543,18 +544,16 @@ class CC_Comic extends CC_Module{
 	public $options = array(); //comic options array
 	
 	//constructor sets basic comic info
-	public function __construct($moduleinfo){
-		
-		global $cc;
-		global $tableprefix;
-		
-		$this->id = $moduleinfo['id'];
-		$this->name = $moduleinfo['title'];		
-		$this->slug = $moduleinfo['slug'];		
-		$this->options = $this->getOptions($moduleinfo);
-		
-		
-	}
+		public function __construct($moduleinfo){
+			
+			global $cc;
+			global $tableprefix;
+			
+			$this->id = $moduleinfo['id'];
+			$this->name = $moduleinfo['title'];		
+			$this->slug = $moduleinfo['slug'];		
+			$this->options = $this->getOptions($moduleinfo);
+		}
 	
 	public function display(){
 		
@@ -564,199 +563,239 @@ class CC_Comic extends CC_Module{
 		
 		//get the current comic
 		$comic = $this->getComic();
+
+		function tagAdd(){ //adds tags 
+			$tagadd = "";
+			
+		        if(($ccpage->slugarr[2] ?? "") == "read-tag"){
+				$tagadd = "/read-tag/" . $ccpage->slugarr[3];
+			}
+
+			return $tagadd;
+		}
 		
 		echo '<div id="cc-comicbody">';
 		
-		if($comic['title'] != ""){
-		
-			//handle displaying swf comics
-			if($comic['mime'] == "application/x-shockwave-flash"){
+		if(isset($comic['title'])){
+			if($comic['mime'] == "application/x-shockwave-flash"){ //handle displaying swf comics
 				echo '<div id="cc-comic" style="height:' . $comic['height'] . 'px; width:' . $comic['width'] . 'px; display:inline-block;">';
 				echo '<embed height="' . $comic['height'] . '" width="' . $comic['width'] . '" src="' . $ccsite->root . 'comics/' . $comic['imgname'] . '" />';
 				echo '</div>';
-			}
-			
-			//handle case for everything else and display comic
-			else{
-				$tagadd = "";
-				if($ccpage->slugarr[2] == "read-tag") $tagadd = "/read-tag/" . $ccpage->slugarr[3];
-				
+			}else{ //handle case for everything else and display comic
+				echo tagAdd();
 				//link to the next page if available
 				if($comic != $this->getSeq("last") && $comic['altnext'] == ""){
 					$nextcomic = $this->getSeq("next");
 					echo '<a href="' . $ccsite->root . $this->slug . '/' . $nextcomic['slug'] . $tagadd . '">';
-				}
-				
-				//if there's an alternative link given, link to that
-				else if($comic['altnext'] != ""){
+				}elseif($comic['altnext'] != ""){ //if there's an alternative link given, link to that
 					echo '<a href="' . $comic['altnext'] . '">';
 				}
-				
 				//output the comic image and close the link
 				$hovertext = $comic['hovertext'];
-				if($hovertext == "") $hovertext = $comic['title'];
+				if($hovertext == ""){
+					$hovertext = $comic['title'];
+				}
 				echo '<img title="' . str_replace('"','&quot;',$hovertext) . '" src="' . $ccsite->root . 'comics/' . $comic['imgname'] . '" id="cc-comic" />';
 				if($comic != $this->getSeq("last") || $comic['altnext'] != ""){
 					echo '</a>';
 				}
-				
-				if($this->options['contentwarnings'] == "on" && trim($comic['contentwarning']) != ""){
-					echo '<script>var contentwarningtext = "' . str_replace('"','&quot;',$comic['contentwarning']) . $user_lang['<br />Click to view this page'] . '";</script>';
-					?>
-					<script>
-					$('#cc-comicbody img').addClass('cc-blur');
-					$('#cc-comicbody').append('<div class="cc-contentwarning">' + contentwarningtext + '</div>');
-					$('#cc-comicbody a').click(function(event){
-						if($('#cc-comicbody img').hasClass('cc-blur')){
-							event.preventDefault();
-							$('#cc-comicbody img').removeClass('cc-blur');
-							$('#cc-comicbody .cc-contentwarning').remove();
-						}
-					});
-					$('.cc-contentwarning').click(function(){
-							$('#cc-comicbody img').removeClass('cc-blur');
-							$('#cc-comicbody .cc-contentwarning').remove();
-					});
-					</script>
-					<?php
-				}
-				
-				//check if fullscreen will be displayed
-				$isfullscreen = false;
-				if($this->options['clickaction'] == "fullscreen") $isfullscreen = true;
-				if($this->options['clickaction'] == "fullscreenbig" && $comic['width'] > $this->options['comicwidth']) $isfullscreen = true;
-				
-				//if option is set to display full size when comic is clicked, put comic in lightbox context
-				if($isfullscreen){
-					?>
-						<script>
-						$('document').ready(function(){
-							var htmlheight = $('html').css('height');
-							var bodyheight = $('body').css('height');
-							
-							$('body').append('<div class="cc-fullscreen-overlay"><img src="<?=$ccsite->root . "comicshighres/" . $comic['comichighres']?>" /></div>');
-								
-							$('#cc-comicbody').on('click',function(e){
-								e.preventDefault();
-								$('body, html').css({'height':'100%','overflow':'hidden'});
-								$('.cc-fullscreen-overlay').fadeIn();
-							});
-							$('.cc-fullscreen-overlay').on('click',function(){
-								$('.cc-fullscreen-overlay').fadeOut(function(){
-									$('body').css({'height':bodyheight});
-									$('html').css({'height':htmlheight});
-									$('body, html').css({'overflow':'auto'});
-								});
-							});
-						});
-						</script>
-							
-					<?php
-				}
+
+			      	echo $this->comicJavascript($comic);
+			}
 			
-				//display hovertext div for mobile if that option is set
-				if($this->options['touchaction'] == "hovertext" && trim($comic['hovertext']) != "" && !$isfullscreen && $comic['altnext'] == ""){
-					?>
-					<script>
-						var touchOn = document.getElementById("cc-comic");
-						delete Hammer.defaults.cssProps.userSelect;
-						delete Hammer.defaults.cssProps.userDrag;
-						delete Hammer.defaults.cssProps.contentZooming;
-						var comicTouchOn = new Hammer(touchOn,{
-  inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput, touchAction : 'auto'
-});
-						
-						if ('ontouchstart' in window) {
-							$("#cc-comicbody a").click(function (e) {
-								e.preventDefault();
-							});
-							comicTouchOn.on("tap", function(){
-								$('body').append('<div class="cc-fullscreen-overlay"><div class="cc-fullscreen-center"><div id="cc-hoverdiv"><?=str_replace("'","\'",$comic['hovertext'])?></div></div></div>');
-								$(".cc-fullscreen-overlay").fadeIn('fast');
-								var overlay = document.getElementsByClassName("cc-fullscreen-overlay");
-								var touchOff = overlay[0];
-								var comicTouchOff = new Hammer(touchOff,{
-  inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput, touchAction : 'auto'
-});
-								comicTouchOff.on("tap", function(){
-									$(".cc-fullscreen-overlay").fadeOut('fast',function(){
-										$(this).remove();
-									});
-								});
-							});
-						}
-					</script>
-					<?php
-				}
-					
-			}
-
-			//insert arrow key navigation if included
-
-			if($this->options['arrowkey'] == "on"){
-
-				//check to add tag reading portion of URL
-				$tagadd = "";
-				if($ccpage->slugarr[2] == "read-tag"){
-					$tagadd = "/read-tag/" . $ccpage->slugarr[3];
-				}
-
-				//get the first and last comic
-				$firstcomic = $this->getSeq("first");
-				$lastcomic = $this->getSeq("last");
-
-				if($firstcomic['id'] == $comic['id']){
-					$prevslug = $comic['slug'];
-				}else{
-					$prevslug = $this->getSeq("prev")['slug'];
-				}
-
-				if($lastcomic['id'] == $comic['id']){
-					$nextslug = $comic['slug'];
-				}else{
-					$nextslug = $this->getSeq("next")['slug'];
-				}
-
+				//insert arrow key navigation if included
+			if($this->options['arrowkey'] == "on"){ //check to add tag reading portion of URL
+		                echo tagAdd();
+		                	
+		                $firstcomic = $this->getSeq("first");	//get the first and last comic
+		                $lastcomic = $this->getSeq("last");
+		                
+		                if($firstcomic['id'] == $comic['id']){
+		                	$prevslug = $comic['slug'];
+		                }else{
+		                	$prevslug = $this->getSeq("prev")['slug'];
+		                }
+		                
+		                if($lastcomic['id'] == $comic['id']){
+		                	$nextslug = $comic['slug'];
+		                }else{
+		                	$nextslug = $this->getSeq("next")['slug'];
+		                }
+		                
+		                $leftDown = "case 37:
+				        	keyPress(prev);
+				        break;";
+				$rightDown = "case 39:
+				        	keyPress(next);
+				        break;";
 				
-				?>
-				<script>
-				function leftArrowPressed() {
-					var prev = "<?=$ccsite->root . $this->slug . '/' . $prevslug . $tagadd?>";
-					window.location = prev;
+				switch($comic){ // checks if it's the last page and if there's anywhere else to go. If there's nowhere, right keypress is wholly disabled
+				    case $firstcomic:
+				        $leftDown = null;
+				    break;
+				    case $lastcomic:
+				        switch(empty($comic['altnext'])){
+				            case true:
+				                $rightDown = null;
+				            break;
+				        }
+				    break;
 				}
-
-				function rightArrowPressed() {
-					var next = "<?=$ccsite->root . $this->slug . '/' . $nextslug . $tagadd?>";
-					window.location = next;
-				}
-
-				document.onkeydown = function(evt) {
-					evt = evt || window.event;
-					switch (evt.keyCode) {
-						case 37:
-							leftArrowPressed();
-							break;
-						case 39:
-							rightArrowPressed();
-							break;
-					}
-				};
-				</script>
-				<?php
-			}
 				
-		}
-		//if current comic wasn't found, deliver error message
-		else{
+				$keyboard = '
+    				<script>
+				    function keyPress(nav){
+				        window.location = nav;
+				    }
+				
+				document.addEventListener("keydown", e => {
+				    const prev = "'. $ccsite->root . $this->slug . '/' . $prevslug . $tagadd . '";
+				    const next = "'. $ccsite->root . $this->slug . '/' . $nextslug . $tagadd . '";
+				    
+				    switch (e.keyCode) {
+				        '. $leftDown .'
+				        '. $rightDown .'
+				    }
+				});
+				</script>';
+
+				echo $keyboard;
+		            }
+			}
+		}else{	//if current comic wasn't found, deliver error message
 			echo '<div class="cc-errormsg">' . $user_lang['There is no comic with this ID.'] . '</div>';	
 		}
 		
 		echo '</div>';
 		
 	}
+
+	private function comicJavascript($comic){ // handles javascript output for comic pages, minus keyboard navigation.
+
+		$javascript = array();
+		$script = null;
+		$isfullscreen = false;
+
+		switch($this->options['clickaction']){	//check if fullscreen will be displayed, important later
+		    case "fullscreen":
+			$isfullscreen = true;
+		    break;
+		    case "fullscreenbig":
+			switch(true){
+			    case $comic['width'] > $this->options['comicwidth']:
+				$isfullscreen = true;
+			    break;
+			}
+		    break;
+		}
+
+		if($this->options['contentwarnings'] == "on" && trim($comic['contentwarning']) != ""){
+			$contentWarnings = str_replace('"', '&quot;', $comic['contentwarning']);
+				//self-note: fix the self-closing <br> thing and make the content warning text easier to style
+			$script = '
+	   <script>
+		const contentwarningtext = "' . $contentWarnings . $user_lang['<br />Click to view this page'] .'";
+		
+		$(\'#cc-comicbody img\').addClass(\'cc-blur\');
+		$(\'#cc-comicbody\').append(\'<div class="cc-contentwarning">\' + contentwarningtext + \'</div>\');
+		$(\'#cc-comicbody a\').on("click", e => {
+			if($(\'#cc-comicbody img\').hasClass(\'cc-blur\')){
+				e.preventDefault();
+				$(\'#cc-comicbody img\').removeClass(\'cc-blur\');
+				$(\'#cc-comicbody .cc-contentwarning\').remove();
+			}
+		});
+			
+		$(\'.cc-contentwarning\').on("click", () => {
+			$(\'#cc-comicbody img\').removeClass(\'cc-blur\');
+			$(\'#cc-comicbody .cc-contentwarning\').remove();
+		});
+	</script>';
+			$javascript[] = $script;
+		}
+
+		if($isfullscreen){ //if option is set to display full size when comic is clicked, put comic in lightbox context
+			$script = "
+	<script>
+		$(() => {
+			const htmlheight = $('html').css('height');
+			const bodyheight = $('body').css('height');
+			
+			$('body').append('<div class=\"cc-fullscreen-overlay\"><img src=\"". $ccsite->root . "comicshighres/" . $comic['comichighres'] ."\"></div>');
+				
+			$('#cc-comicbody').on('click', e => {
+				e.preventDefault();
+				$('body, html').css({'height':'100%','overflow':'hidden'});
+				$('.cc-fullscreen-overlay').fadeIn();
+			});
+			
+			$('.cc-fullscreen-overlay').on('click', () => {
+				$('.cc-fullscreen-overlay').fadeOut(() => {
+					$('body').css({'height':bodyheight});
+					$('html').css({'height':htmlheight});
+					$('body, html').css({'overflow':'auto'});
+				});
+			});
+		});
+	</script>";
+			$javascript[] = $script;
+		}
+
+		if(($this->options['touchaction'] == "hovertext" && trim($comic['hovertext']) != "") && !$isfullscreen && $comic['altnext'] == ""){
+			$hovertext = str_replace("'","\'",$comic['hovertext']); //display hovertext div for mobile if that option is set
+			$script = '
+   	<script>
+		const touchOn = document.getElementById("cc-comic");
+		delete Hammer.defaults.cssProps.userSelect;
+		delete Hammer.defaults.cssProps.userDrag;
+		delete Hammer.defaults.cssProps.contentZooming;
+		const comicTouchOn = new Hammer(touchOn, {
+			inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput, 
+			touchAction: "auto"
+		});
+		
+		if ("ontouchstart" in window) {
+			$("#cc-comicbody a").on("click", e => {
+				e.preventDefault();
+			});
 	
-	//get specific comic based on a slug
-	public function getPost($slug){
+			comicTouchOn.on("tap", () => {
+				$("body").append(\'<div class="cc-fullscreen-overlay"><div class="cc-fullscreen-center"><div id="cc-hoverdiv">'. $hovertext .'</div></div></div>\');
+				$(".cc-fullscreen-overlay").fadeIn("fast");
+				const overlay = document.getElementsByClassName("cc-fullscreen-overlay");
+				const touchOff = overlay[0];
+				const comicTouchOff = new Hammer(touchOff, {
+					inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput, 
+					touchAction: "auto"
+				});
+	
+				comicTouchOff.on("tap", () => {
+					$(".cc-fullscreen-overlay").fadeOut("fast", () => {
+						$(this).remove();
+					});
+				});
+			});
+		}
+	</script>';
+			$javascript[] = $script;
+		}
+
+		foreach($javascript as $key => $value){
+			if(!strlen($value)){
+			   unset($javascript[$key];
+			}
+		}
+
+		if(!$javascript){
+			$javascript = null;
+		}else{
+			$javascript = implode($javascript);
+		}
+		
+		return $javascript;
+	}
+	
+	public function getPost($slug){	//get specific comic based on a slug
 		
 		global $cc;
 		global $tableprefix;
@@ -765,16 +804,17 @@ class CC_Comic extends CC_Module{
 		$comic = array();
 		
 		$query = "SELECT * FROM cc_" . $tableprefix . "comics WHERE slug=:slug AND comic=:comicid";
+				       
 		if($ccuser->authlevel == 0){
 			$query .= ' AND publishtime < ' . time();
 		}
+				       
 		$query .= " LIMIT 1";
 		$stmt = $cc->prepare($query);
 		$stmt->execute(['slug' => $slug, 'comicid' => $this->id]);
 		$comic = $stmt->fetch();
 		
 		return $comic;
-		
 	}
 	
 	//get specific comic based on navigation direction
@@ -869,7 +909,7 @@ class CC_Comic extends CC_Module{
 		return $comic;
 		
 	}
-	
+
 	//get current comic (latest if index, based on slug if not)
 	public function getComic(){
 		
