@@ -1,9 +1,5 @@
-<?php //comic-storyline-rearrange.php - handles rearranging storylines ?>
-
-<?php
-
-//create and output quick links
-$links = array(
+<?php //comic-storyline-rearrange.php - handles rearranging storylines 
+$links = array(	//create and output quick links
 	array(
 		'link' => $ccurl . $navslug . '/' . $ccpage->module->slug,
 		'text' => str_replace('%s',$ccpage->title,$lang['Return to managing %s'])
@@ -18,13 +14,10 @@ $links = array(
 	)
 );
 quickLinks($links);
-
 ?>
-
 <main id="content">
-
-<?php //save changes if form is submitted ?>
-<?php if(isset($_POST['neworder']) && $_POST['neworder'] != ""){
+<?php //save changes if form is submitted
+if(isset($_POST['neworder']) && $_POST['neworder'] != ""){
 	
 	$neworder = $_POST['neworder'];
 	$neworder = explode('&',$neworder);
@@ -39,28 +32,20 @@ quickLinks($links);
 	}
 	echo '<div class="msg success">' . $lang['Your changes have been saved.'] . '</div>';
 }
-
-
-//check storyline is set
+	//check storyline is set
 $storyline = 0;
-if(filter_var($ccpage->slugarr[4], FILTER_VALIDATE_INT)) $storyline = $ccpage->slugarr[4];
-?>
-
-<?php //include necessary libraries ?>
+if(filter_var(($ccpage->slugarr[4] ?? ''), FILTER_VALIDATE_INT)){
+    $storyline = $ccpage->slugarr[4];
+}
+	//include necessary libraries ?>
 <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-
-
 <?php //output rearrange form ?>
 <p><?=$lang['Drag and drop storylines to rearrange them.  Click "Save Changes" to save the new order.']?></p>
-
-<form id="rearrange-form" action="" method="post">
-	<input type="hidden" name="storyline" value="<?=storyline?>" />
-
+<form id="rearrange-form" action="" method="POST">
+	<input type="hidden" name="storyline" value="<?=$storyline;?>" />
 	<div id="storyline-list">
-
 		<?php
-		
 			$query = "SELECT * FROM cc_" . $tableprefix . "comics_storyline WHERE parent=:parent ORDER BY sorder ASC";
 			$stmt = $cc->prepare($query);
 			$stmt->execute(['parent' => $storyline]);
@@ -69,19 +54,13 @@ if(filter_var($ccpage->slugarr[4], FILTER_VALIDATE_INT)) $storyline = $ccpage->s
 			foreach($result as $row){
 				echo '<div class="cc-btn-row" id="storyline_' . $row['id'] . '"><div class="cc-btn dark-bg">' . $row['name'] . '</div></div>';
 			}
-		
 		?>
-
 	</div>
-	
 	<?php //close out the form ?>
 	<button type="button" class="full-width light-bg" id="savechanges"><?=$lang['Save changes']?></button>
-
 </form>
-
 <script>
-
-//script making list sortable and handling form submission
+	//script making list sortable and handling form submission
 $("#storyline-list").sortable();
 $("#storyline-list").disableSelection();
 $('#savechanges').on('click', function(){
