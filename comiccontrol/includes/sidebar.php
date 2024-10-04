@@ -1,5 +1,4 @@
-<?php //sidebar.php - display layout sidebar ?>
-<?php
+<?php //sidebar.php - display layout sidebar 
 	//determine if admin, if not fetch modules permitted
 	$admin = false;
 	$permMods = array();
@@ -16,12 +15,14 @@
 <nav id="sidebar" class="dark-bg">
 	<?php //show the avatar ?>
 	<div id="sidebar-avatar">
-		<?php $ccuser->showAvatar(); ?>
-		<div id="sidebar-avatar-bottom"></div>
+	    <a href="<?=$ccurl;?>">
+		    <?php $ccuser->showAvatar(); ?>
+		</a>
+	    <div id="sidebar-avatar-bottom"></div>
 	</div>
 	
 	<?php //display site title ?>
-	<a id="sidebar-header" href="<?=$ccurl?>"><div class="f-c"><div><i class="fa fa-home"></i> <?=$ccsite->sitetitle?></div></div></a>
+	<a id="sidebar-header" href="<?=$ccsite->root;?>"><div class="f-c"><div><i class="fa fa-home"></i><?=$ccsite->sitetitle?></div></div></a>
 	<a id="menu-expand"><div class="f-c"><i class="fa fa-bars"></i></div></a>
 	
 	<?php //show main menu ?>
@@ -41,19 +42,19 @@
 							switch($module['moduletype']){
 								case "comic":
 									echo 'th-large';
-									break;
+								break;
 								case "blog":
 									echo 'newspaper-o';
-									break;
+								break;
 								case "text":
 									echo 'file';
-									break;
+								break;
 								case "gallery":
 									echo 'image';
-									break;
+								break;
 								default:
 									echo 'file';
-									break;
+								break;
 							}
 							echo '"></i>' . $module['title'] . '</a></li>';
 						}
@@ -75,37 +76,30 @@
 					$stmt = $cc->prepare($query);
 					$stmt->execute();
 					$plugins = $stmt->fetchAll();
+					
 					foreach($plugins as $plugin){
 						echo '<li><a href="' . $ccurl . 'plugins/' . $plugin['slug'] . '"><i class="fa fa-plug"></i>' . $plugin['name'] . '</a></li>';
 					}
-					
 				?>
 				<li><a href="<?=$ccurl?>plugins"><i class="fa fa-cog"></i><?=$lang['Manage plugins...']?></a></li>
 			</ul>
 		</li>
 		<?php //give rest of actions ?>
-		<li>
-			<a href="<?=$ccurl?>image-library"><span class="li-contain"><i class="fa fa-image"></i><?=$lang['Image Library']?></span></a>
-		</li>
-		<li>
-			<a href="<?=$ccurl?>templates"><span class="li-contain"><i class="fa fa-map-o"></i><?=$lang['Templates']?></span></a>
-		</li>
-		<li>
-			<a href="<?=$ccurl?>site-options"><span class="li-contain"><i class="fa fa-cog"></i><?=$lang['Site Options']?></span></a>
-		</li>
-		<li>
-			<a href="<?=$ccurl?>update-check"><span class="li-contain"><i class="fa fa-refresh"></i><?=$lang['Check for Updates']?></span></a>
-		</li>
+		<li><a href="<?=$ccurl?>image-library"><span class="li-contain"><i class="fa fa-image"></i><?=$lang['Image Library']?></span></a></li>
+		<li><a href="<?=$ccurl?>templates"><span class="li-contain"><i class="fa fa-map-o"></i><?=$lang['Templates']?></span></a></li>
+		<li><a href="<?=$ccurl?>site-options"><span class="li-contain"><i class="fa fa-cog"></i><?=$lang['Site Options']?></span></a></li>
+		<li><a href="<?=$ccurl?>update-check"><span class="li-contain"><i class="fa fa-refresh"></i><?=$lang['Check for Updates']?></span></a></li>
 				<?php } ?>
-		<li>
-			<a href="<?=$ccurl?>users"><span class="li-contain"><i class="fa fa-user"></i>
-		<?php //give user management if top-level user; if not, only allow self-management ?>	
-		<?php if($ccuser->authlevel == 2){ ?><?=$lang['Users']?>
-		<?php }else{ ?><?=$lang['Profile']?><?php } ?></span></a></a>
-		</li>
-		<li>
-			<a href="http://www.comicctrl.com/"><span class="li-contain"><i class="fa fa-support"></i><?=$lang['Support']?></span></a>
-		</li>
+		<li><a href="<?=$ccurl?>users"><span class="li-contain"><i class="fa fa-user"></i>
+		<?php //give user management if top-level user; if not, only allow self-management 
+		if($ccuser->authlevel == 2){ 
+            echo $lang['Users'];
+		}else{
+            echo $lang['Profile'];
+		}
+		?>
+		</span></a></li>
+		<li><a href="http://www.comicctrl.com/"><span class="li-contain"><i class="fa fa-support"></i><?=$lang['Support']?></span></a></li>
 		
 		<?php //logout button to display if on mobile ?>
 		<li id="left-logout">
