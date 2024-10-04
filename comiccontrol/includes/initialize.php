@@ -2,7 +2,7 @@
 //initialize.php - builds base classes and objects for both front and backend
 
 //universal functions
-function toSlug($input){
+function toSlug($input = ''){
 	$input = str_replace('%20','-',$input);
 	$input = preg_replace('/[^A-Za-z0-9 \-]/', '', $input);
 	$input = trim($input);
@@ -10,13 +10,15 @@ function toSlug($input){
 	$input = strtolower($input);
 	return $input;
 }
+
 function getSlug($slugnum){
 	
 	global $ccpage;
 	
-	return $ccpage->slugarr[$slugnum];
+	return ($ccpage->slugarr[$slugnum] ?? '');
 	
 }
+
 //get file contents function
 function get_info($url){
 	$curl = curl_init();
@@ -27,6 +29,7 @@ function get_info($url){
 	
 	return $output;
 }
+
 function get_file($url,$fileloc){
 	$file = fopen($fileloc, 'w');
 	$curl = curl_init();
@@ -60,9 +63,11 @@ function getModuleOption($optionname){
 	
 	return $ccpage->module->options[$optionname];
 }
+
 function buildButton($classes,$link,$text){
 	echo '<a class="cc-btn f-c ' . $classes . '" href="' . $link . '">' . $text . '</a>';
 }
+
 function quickLinks($links){
 	echo '<div id="context-links">';
 	foreach($links as $link){
