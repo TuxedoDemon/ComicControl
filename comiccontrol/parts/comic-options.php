@@ -6,12 +6,11 @@
 $forminputs = array();
 
 //submit options if posted
-if(isset($_POST) && $_POST['page-title'] != ""){
-
-	//save general modules options
+if($_SERVER["REQUEST_METHOD"] == "POST"){
+    if($_POST['page-title'] != ""){
+		//save general modules options
 	require_once('save-options.php');
-	
-	//parse and save navigation order
+		//parse and save navigation order
 	$navorder = "";
 	$piped = false;
 	for($i = 0; $i < 5; $i++){
@@ -25,20 +24,18 @@ if(isset($_POST) && $_POST['page-title'] != ""){
 			$navorder .= $_POST[$navname];
 		}
 	}
+	$query = "SELECT * FROM cc_" . $tableprefix . "modules_options WHERE value=:value AND optionname=:optionname";
+	$stmt = $cc->prepare($query);
 	$stmt->execute(['value' => $navorder, 'optionname' => 'navorder']);
-	
-	//rebuild the module so options are updated
+		//rebuild the module so options are updated
 	$ccpage = new CC_Page("$_SERVER[REQUEST_URI]","admin");
-	
-	//output success message
+		//output success message
 	echo '<div class="msg success f-c">' . $lang['changeoptions-success'] . '</div>';
-	
+    }
 }
-
-//output general module options
+	//output general module options
 require_once('module-options.php');
-
-//build comic display options
+	//build comic display options
 $forminputs = array();
 array_push($forminputs,
 	array(
@@ -124,12 +121,10 @@ array_push($forminputs,
 		)
 	)
 );
-
-//echo comic display options
+	//echo comic display options
 echo '<h2 class="formheader">' . $lang['Comic display options'] . '</h2>';
 buildForm($forminputs);
-
-//build comic navigation options
+	//build comic navigation options
 $forminputs = array(
 	array(
 		array(
@@ -209,12 +204,10 @@ $forminputs = array(
 		)
 	)
 );
-
-//get navigation order
+	//get navigation order
 $navorder = $ccpage->module->options['navorder'];
 $navorder = explode('|',$navorder);
-
-//echo comic navigation options
+	//echo comic navigation options
 echo '<h2 class="formheader">' . $lang['Comic navigation options'] . '</h2>';
 echo '<div class="formline">';
 echo '<div class="forminput"><label><div class="v-c">' . $lang['Navigation buttons'] . ':</div></label>';
@@ -244,8 +237,7 @@ echo '</div><div class="tooltip"><a class="f-c">?</a>';
 echo '<div class="tooltip-help"><div class="tooltip-triangle"></div>' . $lang['tooltip-navorder'] . '</div>';
 echo '</div></div></div>';
 buildForm($forminputs);
-
-//build mobile navigation options
+	//build mobile navigation options
 $forminputs = array(
 	array(
 		array(
@@ -261,12 +253,10 @@ $forminputs = array(
 		)
 	)
 );
-
-//echo mobile navigation options
+	//echo mobile navigation options
 echo '<h2 class="formheader">' . $lang['Mobile navigation options'] . '</h2>';
 buildForm($forminputs);
-
-//build archive options
+	//build archive options
 $forminputs = array(
 	array(
 		array(
@@ -324,13 +314,10 @@ $forminputs = array(
 		)
 	)
 );
-
-
-//echo archive options
+	//echo archive options
 echo '<h2 class="formheader">' . $lang['Archive options'] . '</h2>';
 buildForm($forminputs);
-
-//build search options
+	//build search options
 $forminputs = array();
 array_push($forminputs,
 	array(
@@ -344,21 +331,14 @@ array_push($forminputs,
 		)
 	)
 );
-
-//echo search options
+	//echo search options
 echo '<h2 class="formheader">' . $lang['Search options'] . '</h2>';
 buildForm($forminputs);
-
-//close out the form
+	//close out the form
 ?>
 <button class="full-width light-bg" style="margin-top:20px;" type="button" id="submitform"><?=$lang['Submit changes']?></button>
 </form>
-
-<?php
-
-//include relevant javascript
+<?php	//include relevant javascript
 include('includes/form-submit-js.php');
-
 ?>
-
 </main>
