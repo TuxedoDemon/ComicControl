@@ -233,46 +233,40 @@ class CC_Page{
 			default:
 				$this->isindex = false;
 		}
-		
-		//error_log(count($this->slugarr));
 			//fill in variables based on what's in slugarr and who we're showing it to (admin or user)
 		if(!$this->isindex){
-    		if($end == "admin"){
-    			    if(isset($this->slugarr[2])){
-    				    $this->slug = toSlug($this->slugarr[2]);
-    			    }else{
-    			        $this->slug = "";
-    			    }
-    			    if(isset($this->slugarr[3])){
-    				    $this->subslug = toSlug($this->slugarr[3]);
-    			    }else{
-    			        $this->subslug = "";
-    			    }
-    			}else{
-    			    if(isset($this->slugarr[0])){
-        				$this->slug = toSlug($this->slugarr[0]);
-    			    }else{
-    			        $this->subslug = "";
+			$this->slug = "";
+			$this->subslug = "";
+			
+	    		if($end == "admin"){
+				if(isset($this->slugarr[2])){
+				    $this->slug = toSlug($this->slugarr[2]);
+				}
+				
+				if(isset($this->slugarr[3])){
+				    $this->subslug = toSlug($this->slugarr[3]);
+				}
+			}else{
+				if(isset($this->slugarr[0])){
+					$this->slug = toSlug($this->slugarr[0]);
+				}
+				
+				if(isset($this->slugarr[1])){
+					$this->subslug = toSlug($this->slugarr[1]);
+				}
+		
+				if(isset($this->slugarr[2])){
+					if($this->subslug == "page"){
+						$this->pagenum = (ctype_digit($this->slugarr[2])) ? $this->slugarr[2] : 0;
+					}elseif($this->subslug == "search"){
+						$this->searchterm = $this->slugarr[2];
+						if(isset($this->slugarr[3])){
+							$this->pagenum = (ctype_digit((string) $this->slugarr[3])) ? $this->slugarr[3] : 0;
+						}
+					}else{
+						$this->pagenum = "";
+					}
     				}
-    			    
-        			if(isset($this->slugarr[1])){
-    				    $this->subslug = toSlug($this->slugarr[1]);
-    				}else{
-    			        $this->subslug = "";
-    				}
-    				
-    		    if(isset($this->slugarr[2])){
-    		    	if($this->subslug == "page"){
-    		    	    $this->pagenum = (ctype_digit($this->slugarr[2])) ? $this->slugarr[2] : 0;
-    		    	}elseif($this->subslug == "search"){
-    		    	    $this->searchterm = $this->slugarr[2];
-    		    	    if(isset($this->slugarr[3])){
-    		    	    	$this->pagenum = (ctype_digit((string) $this->slugarr[3])) ? $this->slugarr[3] : 0;
-    		    	    }
-    		    	}else{
-    		    	    $this->pagenum = "";
-    			    }
-    		    }
 			}
 		}
 			//get page information from the database
@@ -365,13 +359,12 @@ class CC_Page{
 	//display the title for the page (for the <title> tag mainly)
 	public function displayTitle(){
 		
-		global $user_lang;
-		global $ccsite;
+			global $user_lang;
+			global $ccsite;
+				
+			$hyphen = true;	//keeping track of hyphens.  You know how it is
 		
-		//keeping track of hyphens.  You know how it is
-		$hyphen = true;
-		
-		//comics often have the same name as the site, so we don't want to repeat it
+			//comics often have the same name as the site, so we don't want to repeat it
 		if($this->module->name != $ccsite->sitetitle){
 			echo $this->module->name;
 			$hyphen = false;
@@ -410,7 +403,6 @@ class CC_Page{
 		echo '<meta name="description" content="' . str_replace('"','&quot;',$description) . '" />';
 		echo '<meta name="twitter:title" content="' . str_replace('"','&quot;',$ccsite->sitetitle) . '" />';
 		echo '<meta name="twitter:description" content="' . str_replace('"','&quot;',$description) . '" />';
-
 	}
 }
 
@@ -621,21 +613,21 @@ class CC_Comic extends CC_Module{
 		                $leftDown = "case 37:
 				        	keyPress(prev);
 				        break;";
-				        $rightDown = "case 39:
-				        	keyPress(next);
+				$rightDown = "case 39:
+						keyPress(next);
 				        break;";
 				
-				switch($comic){ // checks if it's the last page and if there's anywhere else to go. If there's nowhere, right keypress is wholly disabled
-				    case $firstcomic:
-				        $leftDown = null;
-				    break;
-				    case $lastcomic:
-				        switch(empty($comic['altnext'])){
-				            case true:
-				                $rightDown = null;
-				            break;
-				        }
-				    break;
+				switch($comic){ // checks if it's the last page and if there's anywhere else to go. If there's nowhere, right keypress is wholly disabled.
+					case $firstcomic:
+						$leftDown = null;
+					break;
+					case $lastcomic:
+						switch(empty($comic['altnext'])){
+							case true:
+								$rightDown = null;
+							break;
+						}
+					break;
 				}
 				
 				$keyboard = '
@@ -656,7 +648,7 @@ class CC_Comic extends CC_Module{
 				</script>';
 
 				echo $keyboard;
-            }
+            		}
 		}else{	//if current comic wasn't found, deliver error message
 			echo '<div class="cc-errormsg">' . $user_lang['There is no comic with this ID.'] . '</div>';	
 		}
@@ -667,11 +659,11 @@ class CC_Comic extends CC_Module{
 
 	private function comicJavascript($comic){ // handles javascript output for comic pages, minus keyboard navigation.
         
-        global $user_lang;
-        
-		$javascript = array();
-		$script = null;
-		$isfullscreen = false;
+	        	global $user_lang;
+	        
+			$javascript = array();
+			$script = null;
+			$isfullscreen = false;
 
 		switch($this->options['clickaction']){	//check if fullscreen will be displayed, important later
 		    case "fullscreen":
@@ -810,13 +802,12 @@ class CC_Comic extends CC_Module{
 	
 	public function getPost($slug){	//get specific comic based on a slug
 		
-		global $cc;
-		global $tableprefix;
-		global $ccuser;
-		
-		$comic = array();
-		
-		$query = "SELECT * FROM cc_" . $tableprefix . "comics WHERE slug=:slug AND comic=:comicid";
+			global $cc;
+			global $tableprefix;
+			global $ccuser;
+			
+			$comic = array();
+			$query = "SELECT * FROM cc_" . $tableprefix . "comics WHERE slug=:slug AND comic=:comicid";
 				       
 		if($ccuser->authlevel == 0){
 			$query .= ' AND publishtime < ' . time();
@@ -833,13 +824,13 @@ class CC_Comic extends CC_Module{
 	//get specific comic based on navigation direction
 	public function getSeq($dir){
 		
-		global $cc;
-		global $tableprefix;
-		global $ccuser;
-		global $ccpage;  
-		
-		$comic = "";
-		$queryadd = "";
+			global $cc;
+			global $tableprefix;
+			global $ccuser;
+			global $ccpage;  
+			
+			$comic = "";
+			$queryadd = "";
 		
 		//extra string to add to check authlevel
 		if($ccuser->authlevel == 0){
@@ -847,10 +838,11 @@ class CC_Comic extends CC_Module{
 		}
 
 		if(($ccpage->slugarr[2] ?? '') == "read-tag"){
-
-			//get all entries of comics with that tag
+				//get all entries of comics with that tag
 			$query = "SELECT comicid FROM cc_" . $tableprefix . "comics_tags WHERE comic=:comic AND tag=:tag";
-			if($ccuser->authlevel == 0) $query .= " AND publishtime < " . time();
+			if($ccuser->authlevel == 0){
+				$query .= " AND publishtime < " . time();
+			}
 			$query .= " ORDER BY publishtime ASC";
 			$stmt = $cc->prepare($query);
 			$stmt->execute(['comic' => $this->id, 'tag' => urldecode($ccpage->slugarr[3])]);
@@ -862,35 +854,33 @@ class CC_Comic extends CC_Module{
 					$query = "SELECT comicid FROM cc_" . $tableprefix . "comics_tags WHERE comic=:comic AND tag=:tag" . $queryadd . " ORDER BY publishtime ASC LIMIT 1";
 					$stmt = $cc->prepare($query);
 					$stmt->execute(['comic' => $this->id, 'tag' => urldecode($ccpage->slugarr[3])]);
-					break;
+				break;
 				case "prev":
 					$currentcomic = $this->getComic();
 					$query = "SELECT comicid FROM cc_" . $tableprefix . "comics_tags WHERE comic=:comic AND tag=:tag AND publishtime < " . $currentcomic['publishtime'] . $queryadd . " ORDER BY publishtime DESC LIMIT 1";
 					$stmt = $cc->prepare($query);
 					$stmt->execute(['comic' => $this->id, 'tag' => urldecode($ccpage->slugarr[3])]);
-					break;
+				break;
 				case "next":
 					$currentcomic = $this->getComic();
 					$query = "SELECT comicid FROM cc_" . $tableprefix . "comics_tags WHERE comic=:comic AND tag=:tag AND publishtime > " . $currentcomic['publishtime'] . $queryadd . " ORDER BY publishtime ASC LIMIT 1";
 					$stmt = $cc->prepare($query);
 					$stmt->execute(['comic' => $this->id, 'tag' => urldecode($ccpage->slugarr[3])]);
-					break;
+				break;
 				case "last":
 					$query = "SELECT comicid FROM cc_" . $tableprefix . "comics_tags WHERE comic=:comic AND tag=:tag" . $queryadd . " ORDER BY publishtime DESC LIMIT 1";
 					$stmt = $cc->prepare($query);
 					$stmt->execute(['comic' => $this->id, 'tag' => urldecode($ccpage->slugarr[3])]);
-					break;
+				break;
 			}
-			$comic = $stmt->fetch();
 			
-			//create array of comics based on those results
+			$comic = $stmt->fetch();
+				//create array of comics based on those results
 			$query = "SELECT * FROM cc_" . $tableprefix . "comics WHERE id=:id";
 			$stmt = $cc->prepare($query);
 			$stmt->execute(['id' => $comic['comicid']]);
 
-		}
-		
-		else{
+		}else{
 			//get comic relative to current comic based on given direction
 			switch($dir){
 				case "first":	
