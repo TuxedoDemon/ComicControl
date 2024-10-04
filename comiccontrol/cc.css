@@ -892,6 +892,7 @@ label {
   padding: 20px;
   opacity: 0;
   z-index: 10;
+  filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
 }
 
 .tooltip .tooltip-triangle {
