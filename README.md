@@ -17,7 +17,7 @@
   <li>Additional templates and corresponding CSS for those who can draw but can't write markup or styling.</li>
   <li>A global toggle switch for content warnings (so if you don't need or want them, they're optional.)
   <ul><li>Additionally, I would like to integrate the already existing tagging functionality into this, so if there's something specific that bugs you and that's also been tagged for, you'll still get a warning for that even if the artist hasn't marked that page with a warning and you have warnings in general turned off.</li></ul></li>
-  <li>The ability to easily customize the look of the website per comic page via a special effects page.(if you like to code and you also like theming!)</li>
+  <li>The ability to easily customize the look of the website per comic page via a special effects page (for if you like to code and you also like theming!)</li>
   <li>More stuff that I cannot remember right now.</li>
 </ul>
 <p>A lot of these things are features that have already been implemented either in full or in part into my personal build of this project. My own build has a lot of things baked into it that are specifically just for me and what I want, so this fork is intended as a more general purpose version of that.</p>
