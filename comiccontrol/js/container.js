@@ -125,16 +125,16 @@ class StorylineContainer extends Container {
 
   //container building function
   buildContainer() {
-    if (this.state.heading == "") this.state.heading = this.lang.toplevel;
+    if (this.state.heading === "") this.state.heading = this.lang.toplevel;
     let arrow = "";
-    if (this.state.storyline != 0) {
+    if (this.state.storyline !== 0) {
       arrow = $(`<div class="back-arrow"><i class="fa fa-caret-left"></i></div><div class="arrow-bump"></div>`);
       arrow.click(() => {
         this.getPage({
           storyline: this.state.parent,
           action: "storyline",
           direction: "left",
-        })
+        });
       }
       );
     }
@@ -181,7 +181,7 @@ class StorylineContainer extends Container {
           storyline: row.id,
           action: this.state.action,
           direction: "right",
-        })
+        });
       }
       );
       return insertRow;
@@ -321,7 +321,7 @@ class MediaContainer extends PageContainer {
 
   //button generating function
   formatButtons(row) {
-    return `<a href="/${this.state.ccroot}image-library/delete-image/${row.id}">${this.lang.delete}</a>`;
+    return `<a href="${this.state.root + this.state.ccroot}image-library/delete-image/${row.id}">${this.lang.delete}</a>`;
   }
   //row generating function
 
