@@ -16,7 +16,7 @@
   <li>An Open Graph image creator for social media.</li>
   <li>Additional templates and corresponding CSS for those who can draw but can't write markup or styling.</li>
   <li>A global toggle switch for content warnings (so if you don't need or want them, they're optional.)
-  <ul><li>Additionally, I would like to implement the tagging function into this, so if there's something specific that bugs you and that's also been tagged for, you'll still get a warning for that even if the artist hasn't marked it.</li></ul></li>
+  <ul><li>Additionally, I would like to integrate the already existing tagging functionality into this, so if there's something specific that bugs you and that's also been tagged for, you'll still get a warning for that even if the artist hasn't marked that page with a warning and you have warnings in general turned off.</li></ul></li>
   <li>The ability to easily customize the look of the website per comic page via a special effects page.(if you like to code and you also like theming!)</li>
   <li>More stuff that I cannot remember right now.</li>
 </ul>
