@@ -203,6 +203,7 @@ $lang['error-normaltext'] = 'This field must have at least one character.';
 $lang['error-date'] = 'Dates must be in mm/dd/yyyy format.';
 $lang['error-file'] = 'You must upload a file here.';
 $lang['error-int'] = 'This field must be a positive integer.';
+$lang['error-prefix'] = 'This filename contains invalid characters. Please rename it and try again.';
 $lang['No comic was found with this information.'] = 'No comic was found with this information.';
 
 //content-editor-js.php & img-upload-js.php
@@ -233,8 +234,8 @@ $lang['tooltip-displaylanguage'] = "This option determines the ComicControl-spec
 $lang['tooltip-maxcomicwidth'] = "This option determines how wide, in pixels, the comic will be saved as.  If you upload a high resolution version of your comic, it will be resized down to this for display on your website.  If you have the option selected to display an enlarged version of the comic when the page is clicked, the higher resolution, non-resized version of your comic will be displayed.";
 $lang['tooltip-newsmode'] = "This option determines what news will be displayed with your comic.  If you select Each Post, the news post you enter for each comic will be displayed, even if it is empty.  If you select Latest News, the latest non-empty news post will be displayed with your comic post.";
 $lang['tooltip-displaytags'] = "This option determines whether or not tags will be displayed in the news post for your comic.  Tags are displayed as a list above the comments section (or at the bottom of the post if comments are disabled).  Clicking a tag allows a user to search for comics with the same tag.";
-$lang['tooltip-displaytranscript'] = "This option determines whether or not a comic transcript will be displayed in the news post for your comic.  If this option is selected, you will be able to input a transcript for your comic pages, and that transcript will be displayed.";
-$lang['tooltip-clicktoview'] = "This option determines whether or not the comic transcript will be hidden in a collapsed section in the news post.  If this option is selected, then the comic transcript will be hidden until the user clicks a button to display the transcript.  This option is ignored if the display transcript option is off.";
+$lang['tooltip-displaytranscript'] = "This option determines whether or not a comic transcript will be displayed in the news post for your comic. If this option is selected, you will be able to input a transcript for your comic pages, and that transcript will be displayed.";
+$lang['tooltip-clicktoview'] = "This option determines whether or not the comic transcript will be hidden in a collapsed section in the news post. If this option is selected, then the comic transcript will be hidden until the user clicks a button to display the transcript.  This option is ignored if the display transcript option is off.";
 $lang['tooltip-displaycomments'] = "This option determines whether or not comments are displayed with the news post of a comic page.  Comment systems are run and moderated through Disqus, and you must set up a Disqus account in order to use comments.";
 $lang['tooltip-usecontentwarnings'] = "This option allows you to use content warnings on your pages.  This will allow you to add content warnings to a page if that page has sensitive content that you wish to hide until the user agrees to view it.  If a content warning is added to a page, that page is blurred until the user clicks away the content warning.";
 $lang['tooltip-auxdestination'] = "This option determines where the user will be directed upon clicking the auxiliary navigation button, if you choose to use that.  RSS will direct the user to an RSS feed for your comic; Comic Archive will direct the user to the comic's archive page.";
@@ -322,12 +323,12 @@ $lang['tooltip-gallerythumbheight'] = 'This option determines the maximum height
 $lang['Your image was successfully added.'] = 'Your image was successfully added.';
 $lang['Add another image'] = 'Add another image';
 $lang['Edit this image'] = 'Edit this image';
-$lang['There was an error adding your image.  Please try again.'] = 'There was an error adding your image.  Please try again.';
+$lang['There was an error adding your image.  Please try again.'] = 'There was an error adding your image. Please try again.';
 
 //gallery-edit
 $lang['Your image was successfully edited.'] = 'Your image was successfully edited.';
 $lang['Edit this image again'] = 'Edit this image again';
-$lang['There was an error editing your image.  Please try again.'] = 'There was an error editing your image.  Please try again.';
+$lang['There was an error editing your image.  Please try again.'] = 'There was an error editing your image. Please try again.';
 
 //gallery-delete
 $lang['No image was found with this information.'] = 'No image was found with this information.';
@@ -442,11 +443,11 @@ $lang['error-confirm'] = 'This field must match the entered password.';
 
 //user messages
 $lang['This user was successfully added.'] = 'This user was successfully added.';
-$lang['There was an error added this user.  Please try again.'] = 'There was an error added this user.  Please try again.';
-$lang['Sorry, there is already a user with this username.  Please go back and select a different username.'] = 'Sorry, there is already a user with this username.  Please go back and select a different username.';
+$lang['There was an error added this user.  Please try again.'] = 'There was an error when adding this user. Please try again.';
+$lang['Sorry, there is already a user with this username.  Please go back and select a different username.'] = 'Sorry, there is already a user with this username. Please go back and select a different username.';
 $lang['There is no user with this ID.'] = 'There is no user with this ID.';
 $lang['No user was found with this information.'] = 'No user was found with this information.';
-$lang['The logged in user cannot delete their own account.'] = 'The logged in user cannot delete their own account.';
+$lang['The logged in user cannot delete their own account.'] = 'A logged in user cannot delete their own account.';
 
 //login
 $lang['Login'] = 'Login';
@@ -458,7 +459,7 @@ $lang['To reset your password, please type in a new password and confirm it belo
 $lang['Reset password'] = 'Reset password';
 $lang['To reset your password, please submit your e-mail address.  An e-mail will be sent to your account with a link to reset your password.'] = 'To reset your password, please submit your e-mail address.  An e-mail will be sent to your account with a link to reset your password.';
 $lang['ComicControl - Password Reset Request'] = 'ComicControl - Password Reset Request';
-$lang['passwordresetmessage1'] = "<h1>Your Password Reset Request</h1><p>A password reset has been requested through your ComicControl account.  Please visit this link to reset your password:</p>";
+$lang['passwordresetmessage1'] = "<h1>Your Password Reset Request</h1><p>A password reset has been requested through your ComicControl account. Please visit this link to reset your password:</p>";
 $lang['passwordresetmessage2'] = "<p>-ComicControl</p>";
 $lang['A password reset e-mail has been sent to your address.  Please follow the instructions in the e-mail to reset your password.'] = 'A password reset e-mail has been sent to your address.  Please follow the instructions in the e-mail to reset your password.';
 $lang['There was an error sending an e-mail to this address. Please try again.'] = 'There was an error sending an e-mail to this address. Please try again.';
@@ -469,11 +470,11 @@ $lang['There was an error changing your password.  Please go back and try again.
 $lang['Use the editor below to edit the code for your template files.  You can also use the dropdown to change to a different template file to edit.'] = 'Use the editor below to edit the code for your template files.  You can also use the dropdown to change to a different template file to edit.';
 $lang['tooltip-changetemplate'] = "Select a template file here to edit a different file.";
 $lang['This template has been successfully saved.'] = 'This template has been successfully saved.';
-$lang['There was an error saving this template.  Please try again.'] = 'There was an error saving this template.  Please try again.';
+$lang['There was an error saving this template.  Please try again.'] = 'There was an error saving this template. Please try again.';
 
 //upgrade check
 $lang['Your version of ComicControl is up to date!'] = 'Your version of ComicControl is up to date!';
-$lang['Your version of ComicControl needs updating!  Here are change notes for this update:'] = 'Your version of ComicControl needs updating!  Here are change notes for this update:';
+$lang['Your version of ComicControl needs updating!  Here are change notes for this update:'] = 'Your version of ComicControl needs updating! Here are change notes for this update:';
 $lang['Please click the button below to update your version of ComicControl.  After clicking the button, please do not leave the page until you receive confirmation that ComicControl has been updated.  Please be aware that this will overwrite the main ComicControl files.'] = 'Please click the button below to update your version of ComicControl.  After clicking the button, please do not leave the page until you receive confirmation that ComicControl has been updated.  Please be aware that this will overwrite the main ComicControl files.';
 $lang['Upgrade ComicControl'] = 'Upgrade ComicControl';
 $lang['Your version of ComicControl has been successfully updated.'] = 'Your version of ComicControl has been successfully updated.';
