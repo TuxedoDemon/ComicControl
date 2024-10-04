@@ -7,7 +7,7 @@
 <h2><em>I would advise against using this fork for the moment.</em></h2>
 <p>It's still loaded with bugs.</p>
 
-<h2>What's in the plans?</h2>
+<h2>What are your plans?</h2>
 <p>I'm glad you asked!</p>
 <p>After all the bugs are squashed, I have a good handful of things I'm excited to integrate into this project, including:</p>
 <ul>
