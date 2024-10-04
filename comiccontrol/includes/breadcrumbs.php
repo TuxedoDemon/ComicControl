@@ -3,14 +3,13 @@
 <header id="navheader" class="dark-bg no-arrow">
 	<?php
 		$currentpage = getSlug(1);
-		
 		//header adding for modules since they have a special title format and extra slug
 		if($currentpage == "modules"){
 			
 			//output the module title and type
 			echo '<div class="header-block header-page has-subtitle"><span class="title">';
 			echo '<a href="' . $ccurl . $navslug . '/' . getSlug(2) . '">' . $ccpage->title . '</a>';
-			echo '</span><br /><span class="subtitle">';
+			echo '</span><br><span class="subtitle">';
 			echo str_replace('%s',ucwords($ccpage->moduletype),$lang['%s Module']);
 			echo '</span>';
 			
@@ -21,52 +20,49 @@
 			switch(getSlug(3)){
 				case "add-post":
 					echo $lang['Add post'];
-					break;
+				break;
 				case "edit-post":
 					echo $lang['Edit post'];
-					break;
+				break;
 				case "manage-posts":
 					echo $lang['Manage posts'];
-					break;
+				break;
 				case "delete-post":
 					echo $lang['Delete post'];
-					break;
+				break;
 				case "manage-storylines":
 					echo $lang['Manage storylines'];
-					break;
+				break;
 				case "add-storyline":
 					echo $lang['Add storyline'];
-					break;
+				break;
 				case "edit-storyline":
 					echo $lang['Edit storyline'];
-					break;
+				break;
 				case "rearrange-storylines":
 					echo $lang['Rearrange storylines'];
-					break;
+				break;
 				case "delete-storyline":
 					echo $lang['Delete storyline'];
-					break;
+				break;
 				case "manage-options":
 					echo $lang['Manage module options'];
-					break;
+				break;
 				case "add-image":
 					echo $lang['Add an image'];
-					break;
+				break;
 				case "edit-image":
 					echo $lang['Edit image'];
-					break;
+				break;
 				case "delete-image":
 					echo $lang['Delete image'];
-					break;
+				break;
 				case "rearrange-images":
 					echo $lang['Rearrange images'];
-					break;
+				break;
 			}
 			echo '</div>';
-		}
-		
-		//if not a module, echo the title and action
-		else{
+		}else{   //if not a module, echo the title and action
 		?>
 		<div class="header-block">
 		<?php
@@ -75,31 +71,31 @@
 			switch($currentpage){
 				case "image-library":
 					echo '<a href="' . $ccurl . $navslug . '/">' . $lang['Image Library'] . '</a>';
-					break;
+				break;
 				case "site-options":
 					echo '<a href="' . $ccurl . $navslug . '/">' . $lang['Site Options'] . '</a>';
-					break;
+				break;
 				case "users":
 					echo '<a href="' . $ccurl . $navslug . '/">' . $lang['Users'] . '</a>';
-					break;
+				break;
 				case "update-check":
 					echo '<a href="' . $ccurl . $navslug . '/">' . $lang['Check for Updates'] . '</a>';
-					break;
+				break;
 				case "upgrade":
 					echo '<a href="' . $ccurl . 'update-check/">' . $lang['Check for Updates'] . '</a>';
-					break;
+				break;
 				case "templates":
 					echo '<a href="' . $ccurl . $navslug . '/">' . $lang['Templates'] . '</a>';
-					break;
+				break;
 				case "manage-modules":
 					echo '<a href="' . $ccurl . $navslug . '/">' . $lang['Manage modules'] . '</a>';
-					break;
+				break;
 				case "plugins":
 					echo '<a href="' . $ccurl . $navslug . '/">' . $lang['Plugins'] . '</a>';
-					break;
+				break;
 				case "":
-					echo '<a href="' . $ccurl . $navslug . '/">' . $lang['Home'] . '</a>';
-					break;
+					echo '<a href="' . $ccurl . '">' . $lang['Home'] . '</a>';
+				break;
 			}
 			
 			//output the action title if one is selected
@@ -108,25 +104,25 @@
 				switch(getSlug(2)){
 					case "add-user":
 						echo $lang['Add a user'];
-						break;
+					break;
 					case "edit-user":
 						echo $lang['Edit user'];
-						break;
+					break;
 					case "delete-user":
 						echo $lang['Delete user'];
-						break;
+					break;
 					case "permissions-user":
 						echo $lang['Manage Permissions'];
-						break;
+					break;
 					case "add-module":
 						if(!isset($_POST) || $_POST['title'] == "") echo $lang['Add a module'];
-						break;
+					break;
 					case "delete-module":
 						if(getSlug(4) != "confirmed") echo $lang['Delete module'];
-						break;
+					break;
 					case "delete-image":
 						echo $lang['Delete image'];
-						break;
+					break;
 				}
 			}
 			echo '</div>';
