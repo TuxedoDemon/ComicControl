@@ -9,13 +9,10 @@
 <link rel="icon" href="<?=$ccsite->root?>favicon.ico" type="image/x-icon">
 <link href="<?=$ccsite->root?>templates/basic/styles.css" type="text/css" rel="stylesheet" />
 
-
-<title><?=$ccsite->sitetitle?> - <?php $ccpage->displayTitle();  ?></title>
+<?php $ccpage->displayMeta(); ?>
 <script src="<?=$ccsite->jquery?>"></script>
 <script src="<?=$ccsite->hammerjs?>"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<?php $ccpage->displayMeta(); ?>
-
 
 </head>
 <body>
