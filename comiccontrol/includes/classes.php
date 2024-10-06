@@ -251,8 +251,8 @@ class CC_Page{
 					if($this->subslug == "page"){
 						$this->pagenum = (ctype_digit($this->slugarr[2])) ? $this->slugarr[2] : 0;
 					}elseif($this->subslug == "search"){
+					    $this->searchterm = $this->slugarr[2];
 						if(isset($this->slugarr[3])){
-                            $this->searchterm = $this->slugarr[2];
 							$this->pagenum = (ctype_digit((string) $this->slugarr[3])) ? $this->slugarr[3] : 0;
 						}
 					}else{
@@ -298,15 +298,15 @@ class CC_Page{
 	public function checkvars(){
 		
 		print_r($this->slugarr);
-		echo '<br />';
-		echo $this->title . '<br />';
-		echo $this->moduletype . '<br />';
-		echo $this->template . '<br />';
-		echo $this->language . '<br />';
-		echo $this->slug . '<br />';
-		echo $this->subslug . '<br />';
-		echo $this->searchterm . '<br />';
-		echo $this->pagenum . '<br />';
+		echo '<br>';
+		echo $this->title . '<br>';
+		echo $this->moduletype . '<br>';
+		echo $this->template . '<br>';
+		echo $this->language . '<br>';
+		echo $this->slug . '<br>';
+		echo $this->subslug . '<br>';
+		echo $this->searchterm . '<br>';
+		echo $this->pagenum . '<br>';
 		echo ($this->isindex) ? 'true' : 'false' . '<br>';
 	}
 	
@@ -352,16 +352,16 @@ class CC_Page{
             $moduletype = $this->moduletype;
             $subslug = $this->subslug;
             $searchterm = urldecode($this->searchterm);
-            $titleTag = '<title>' . $ccsite->sitetitle;
-            $hyphen = true;
-            
+            $titleTag = '<title>';
+            $hyphen = false;
+
                 //comics often have the same name as the site, so we don't want to repeat it
             if($this->module->name != $ccsite->sitetitle){
                 $titleTag = '<title>' . $this->module->name;
-                $hyphen = false;
+                $hyphen = true;
             }
-            
-            if(!$hyphen){
+           
+            if($hyphen){
                 $titleTag .= ' -';
             } 
             
@@ -1408,31 +1408,36 @@ class CC_Comic extends CC_Module{
 				echo $arr['name'] . '</option>';
 			}
                 //go further down the rabbit hole
-			$this->recurseChapters($children,$dropdown,$current);
+			$this->recurseChapters($children, $dropdown, $current);
 		}
 	}
 	
 	//search for comics with a given tag
 	public function search(){
 		
-		global $cc;
-		global $ccpage;
-		global $ccsite;
-		global $tableprefix;
-		global $ccuser;
-		global $user_lang;
+    		global $cc;
+    		global $ccpage;
+    		global $ccsite;
+    		global $tableprefix;
+    		global $ccuser;
+    		global $user_lang;
 		
 		//set page number
 		$page = $ccpage->pagenum;
-		if($page < 1) $page = 1;
+		if($page < 1){
+		    $page = 1;
+		} 
 		
 		//set the minimum post number for this page
 		$lowerlimit = ($page - 1) * $this->options['perpage'];
-		if($lowerlimit < 0) $lowerlimit = 0;
-		
+    		if($lowerlimit < 0){
+    		    $lowerlimit = 0;
+    		} 
 		//get all entries of comics with that tag
 		$query = "SELECT comicid FROM cc_" . $tableprefix . "comics_tags WHERE comic=:comic AND tag=:tag";
-		if($ccuser->authlevel == 0) $query .= " AND publishtime < " . time();
+    		if($ccuser->authlevel == 0){
+    		    $query .= " AND publishtime < " . time();
+    		} 
 		$query .= " ORDER BY publishtime ASC";
 		$stmt = $cc->prepare($query);
 		$stmt->execute(['comic' => $this->id, 'tag' => urldecode($ccpage->searchterm)]);
@@ -1442,17 +1447,19 @@ class CC_Comic extends CC_Module{
 		//create array of comics based on those results
 		foreach($taggedposts as $post){
 			$query = "SELECT slug,title,comicthumb FROM cc_" . $tableprefix . "comics WHERE id=:comicid";
-			if($ccuser->authlevel == 0) $query .= " AND publishtime < " . time();
+    			if($ccuser->authlevel == 0){
+    			     $query .= " AND publishtime < " . time();
+    			}
 			$query .= " LIMIT 1";
 			$stmt = $cc->prepare($query);
 			$stmt->execute(['comicid' => $post['comicid']]);
-			array_push($allposts,$stmt->fetch());
+			array_push($allposts, $stmt->fetch());
 		}
 		$numposts = count($allposts);
 		$numpages = ceil($numposts / $this->options['perpage']);
 		
 		//get the subset of that array that will be on this page
-		$posts = array_slice($allposts,$lowerlimit,$this->options['perpage']);
+		$posts = array_slice($allposts, $lowerlimit, $this->options['perpage']);
 		
 		//display the results
 		echo '<div class="cc-searchheader">' . str_replace('%s',urldecode($ccpage->searchterm), $user_lang['Comics tagged with "%s"']) . ' - ' . str_replace('%n', $page, $user_lang['Page %n']) . '</div>';
@@ -1474,9 +1481,9 @@ class CC_Comic extends CC_Module{
 	
 	public function checkComic(){
 		
-		echo $this->id . '<br />'; //module id
-		echo $this->name . '<br />'; //comic name
-		echo $this->type . '<br />'; //module type
+		echo $this->id . '<br>'; //module id
+		echo $this->name . '<br>'; //comic name
+		echo $this->type . '<br>'; //module type
 		print_r($this->options); //comic options array
 		
 	}
