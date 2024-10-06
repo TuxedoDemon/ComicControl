@@ -68,6 +68,10 @@
   font-style: italic;
 }
 
+* {
+    box-sizing: border-box;
+}
+
 /* page-specific */
 .cc-previewbar {
   width: 100%;
@@ -139,11 +143,12 @@
 
 #cc-comic {
   margin: 0 auto;
-  margin-top: 0px;
+  margin-top: 0;
 }
 
 #cc-comicbody {
   position: relative;
+  overflow: hidden;
 }
 
 #cc-transcriptclick {
@@ -160,6 +165,31 @@
 .cc-storyline-thumb {
   float: left;
   margin-bottom: 10px;
+  overflow: hidden; 
+  position: relative;
+}
+
+.cc-comicthumbnail {
+    position: relative; 
+    padding: 0.25rem; 
+    text-align: center;
+    font-weight: bold;
+    
+}
+
+.cc-pagethumb-contentwarning {
+    position: absolute;
+    display: flex; 
+    pointer-events: none; 
+    justify-content: center; 
+    align-items: center;
+    z-index: 1; 
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-color: rgb(255,255,255,0.25);
+    background-color: rgba(255,255,255,0.25);
 }
 
 .cc-storyline-text {
@@ -345,10 +375,6 @@
   text-align: center;
 }
 
-#cc-comicbody {
-  position: relative;
-}
-
 #cc-hoverdiv {
   position: absolute;
   width: 74%;
@@ -382,13 +408,13 @@
 
 .cc-gallery a,
 .cc-storyline-pagethumb {
-  margin: 10px;
-  padding: 5px;
+  overflow: hidden;
+  position: relative;
 }
 
 .cc-gallery a img,
 .cc-storyline-pagethumb a img {
-  width: 120px;
+  width: auto;
   max-height: 200px;
   -o-object-fit: contain;
   object-fit: contain;
@@ -425,15 +451,41 @@
 }
 
 .cc-contentwarning {
-  position: absolute;
-  width: 70%;
-  padding: 15px;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  text-align: center;
-  left: 15%;
-  font-weight: bold;
-  background: white;
-  z-index: 20;
-  top: 50px;
+flex-flow: column nowrap;
+justify-content: flex-start;
+gap: 1em;
+text-align: center;
+align-items: center;
+width: auto;
+height: auto;
+padding: 1em 0 0;
+background: #ffffff9f;
+background: rgba(255, 255, 255, .625);
+top: 0;
+bottom: 0;
+right: 0;
+left: 0;
+cursor: pointer;
+display: flex;
+position: absolute;
+z-index: 20;
+}
+
+.cc-contentwarning p{
+    background-color: white;
+    margin: 0;
+    padding: 1rem 0;
+    width: 100%;
+    border-top: 4px double #000;
+    border-bottom: 4px double #000;
+}
+
+.cc-pagethumb-title {
+    display: inline-block;
+    font-weight: 900;
+    width: 100%;
+}
+
+.cc-contentwarning h2{
+    margin: 0 0 0 0;
 }
