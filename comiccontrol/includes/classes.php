@@ -46,6 +46,7 @@ class CC_Site{
 
 		if($this->timezone == '') $this->timezone = "America/Chicago";
 	}
+	
 	private function fetchoption($option){
 		global $cc;
 		
@@ -54,6 +55,7 @@ class CC_Site{
 		$row = $stmt->fetch();
 		return $row['optionvalue'];
 	}
+	
 	private function setProtocol($url){
 		$baseurl = substr($url,strpos($url,'/'));
 		$newurl = "";
@@ -132,8 +134,8 @@ class CC_User{
 	//log in user if they're authorized
 	private function loginuser($userinfo,$loginhash = 0,$sessionhash = 0){
 		
-		global $cc;
-		global $tableprefix;
+            global $cc;
+            global $tableprefix;
 		
 		//create login if not logged in
 		if($loginhash == 0){//create the user-end hash
@@ -222,7 +224,7 @@ class CC_Page{
 		}
 			//check if it's the index page
 		$this->isindex = (count($this->slugarr) == 0) ? true : false;
-		switch($this->slugarr[0]){
+		switch($this->slugarr[0] ?? ''){
 			case "index.php":
 				$this->isindex = true;
 			break;
@@ -250,7 +252,7 @@ class CC_Page{
 						$this->pagenum = (ctype_digit($this->slugarr[2])) ? $this->slugarr[2] : 0;
 					}elseif($this->subslug == "search"){
 						if(isset($this->slugarr[3])){
-						    $this->searchterm = $this->slugarr[2];
+                            $this->searchterm = $this->slugarr[2];
 							$this->pagenum = (ctype_digit((string) $this->slugarr[3])) ? $this->slugarr[3] : 0;
 						}
 					}else{
@@ -305,14 +307,16 @@ class CC_Page{
 		echo $this->subslug . '<br />';
 		echo $this->searchterm . '<br />';
 		echo $this->pagenum . '<br />';
-		echo ($this->isindex) ? 'true' : 'false' . '<br />';
+		echo ($this->isindex) ? 'true' : 'false' . '<br>';
 	}
 	
 	//build module if one specific module is set; not called if custom page
 	public function buildModule($slug){
 		
-		global $cc;
-		global $tableprefix;
+            global $cc;
+            global $tableprefix;
+            
+            $module = null;
 		
 		//get the module from the database
 		$query = "SELECT * FROM cc_" . $tableprefix . "modules WHERE slug=:slug LIMIT 1";
@@ -320,7 +324,6 @@ class CC_Page{
 		$stmt->execute(['slug' => $slug]);
 		$moduleinfo = $stmt->fetch();
 		
-		$module = null;
 		    //if the module was found, build the module
 		if(!empty($moduleinfo['id'])){
 			switch($moduleinfo['moduletype']){
@@ -331,66 +334,107 @@ class CC_Page{
 					$module = new CC_Comic($moduleinfo);
 				break;
 				case "blog":
-					$module = new CC_Blog($moduleinfo,$this->subslug);
+					$module = new CC_Blog($moduleinfo, $this->subslug);
 				break;
 				case "gallery":
 					$module = new CC_Gallery($moduleinfo);
 				break;
 			}
 			
-			return $module; //if the module wasn't found, module is null
+			return $module; //if the module wasn't found, module remains as null
 		}
 	}
-	
-	//display the title for the page (for the <title> tag mainly)
-	public function displayTitle(){
-		
-			global $user_lang;
-			global $ccsite;
-				
-			$hyphen = true;	//keeping track of hyphens.  You know how it is
-
-		//comics often have the same name as the site, so we don't want to repeat it
-		if($this->module->name != $ccsite->sitetitle){
-			echo $this->module->name;
-			$hyphen = false;
-		}
-		
-		//if there's extra info, add that to the title
-		if($this->moduletype == "comic" || ($this->moduletype == "blog" && isset($this->subslug))){
-			
-			if(!$hyphen) echo ' - ';
-			
-			if($this->subslug == "archive"){
-				echo $user_lang['Archive'];
-			}elseif($this->subslug == "search"){
-				echo $user_lang['Search'] . ' - ' . urldecode($this->searchterm);
-			}elseif($this->subslug == "filter"){
-				echo urldecode($this->searchterm);
-			}elseif($this->subslug == "page"){
-				echo str_replace('%n', $this->pagenum, $user_lang['Page %n']);
-			}else{ //if slug is assigned, get comic or blog title
-				if($this->isindex){
-					$post = $this->module->getSeq("last");
-				}else{
-					$post = $this->module->getPost($this->subslug);
+        //generates metadata title to be displayed on browser tabs and in search engines
+    private function titleTag(){	
+        
+                global $ccsite;
+    
+            $moduletype = $this->moduletype;
+            $subslug = $this->subslug;
+            $searchterm = urldecode($this->searchterm);
+            $titleTag = '<title>' . $ccsite->sitetitle;
+            $hyphen = true;
+            
+                //comics often have the same name as the site, so we don't want to repeat it
+            if($this->module->name != $ccsite->sitetitle){
+                $titleTag = '<title>' . $this->module->name;
+                $hyphen = false;
+            }
+            
+            if(!$hyphen){
+                $titleTag .= ' -';
+            } 
+            
+		switch($moduletype){
+			case 'blog':
+				switch($this->module->getPost($subslug)){
+					case true:
+						$titleTag .= " " . $this->module->getPost($subslug)['title'] . '</title>' . "\n"; 
+					break;
+					case false:
+						switch($subslug){
+							case null:
+							case 'page':
+								$titleTag .= ' Archive</title>' . "\n";
+							break;
+							case 'search':
+                                $titleTag .= ' Search - '. $searchterm .'</title>' . "\n";
+							break;
+							case 'filter':
+                                $titleTag .= " " . $searchterm . '</title>' . "\n";
+                            break;
+							default:
+                                $titleTag .= ' Error</title>' . "\n";
+                            break;
+						}
+					break;
 				}
-				echo $post['title'] ?? '';
-			}
+			break;
+			case 'comic':
+				switch($this->module->getComic($subslug)){
+					case true: 
+						$titleTag .= " " . $this->module->getComic()['title'] . '</title>' . "\n";
+					break;
+					case false:
+						switch($subslug){
+							case 'archive':
+								$titleTag .= " " . ucwords($subslug) . '</title>' . "\n";
+							break;
+							case 'search':
+                                $titleTag .= ' Search - '. $searchterm .'</title>' . "\n";
+							break;
+							case 'filter':
+                                $titleTag .= " " . $searchterm . '</title>' . "\n";
+                            break;
+							default:
+							    $titleTag .= ' Error</title>' . "\n";
+							break;
+						}
+					break;
+            	}
+			break;
+			default:
+				$titleTag .= '</title>';
 		}
+		
+		return $titleTag;
 	}
 
 	public function displayMeta(){
 		
             global $ccsite;
+            
+            $title = str_replace('"', '&quot;', $this->titleTag());
             $description = $this->description;
 		
 		if($description == ""){
             $description = $ccsite->description;
-		} 
-		echo '<meta name="description" content="' . str_replace('"','&quot;',$description) . '">';
-		echo '<meta name="twitter:title" content="' . str_replace('"','&quot;',$ccsite->sitetitle) . '">';
-		echo '<meta name="twitter:description" content="' . str_replace('"','&quot;',$description) . '">';
+		}
+		
+		echo $title;
+		echo '<meta name="description" content="' . str_replace('"', '&quot;', $description) . '">';
+		echo '<meta name="twitter:title" content="' . str_replace('"', '&quot;', $ccsite->sitetitle) . '">';
+		echo '<meta name="twitter:description" content="' . str_replace('"', '&quot;', $description) . '">';
 	}
 }
 
@@ -543,7 +587,7 @@ class CC_Comic extends CC_Module{
 		global $user_lang;
 			
 		$comic = $this->getComic();
-		$javascript = $this->comicJavascript($comic);
+		$javscript = $this->comicJavascript($comic);
 
 		function tagAdd(){ //adds tags 
 				  
@@ -582,7 +626,7 @@ class CC_Comic extends CC_Module{
 				echo '</a>';
 				
 				if(isset($javascript)){
-    				echo $javascript;
+    				echo $script;
 				}
 			}
 				//insert arrow key navigation if included
