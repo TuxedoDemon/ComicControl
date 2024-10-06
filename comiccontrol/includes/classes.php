@@ -659,11 +659,7 @@ class CC_Comic extends CC_Module{
 						$leftDown = null;
 					break;
 					case $lastcomic:
-						switch(empty($comic['altnext'])){
-							case true:
-								$rightDown = null;
-							break;
-						}
+						$rightDown = null;
 					break;
 				}
 				
@@ -717,7 +713,6 @@ class CC_Comic extends CC_Module{
         if(isset($comic['contentwarning'])){
             if($this->options['contentwarnings'] == "on" && trim($comic['contentwarning']) != ""){
             	$contentWarnings = str_replace('"', '&quot;', $comic['contentwarning']);
-            		//self-note: fix the self-closing <br> thing and make the content warning text easier to style
             	$script = '
             <script>
                function delegateEvent(element, type, id, callback){
@@ -728,7 +723,7 @@ class CC_Comic extends CC_Module{
                 });
             }
                
-            const contentwarningtext = "<h2>Content Warning</h2>' . $contentWarnings . $user_lang['<br />Click to view this page'] .'";
+            const contentwarningtext = "<h2>Content Warning</h2><p>' . $contentWarnings . '</p><span>' . $user_lang['Click to view this page.'] .'</span>";
             const last = document.getElementById("last-page");
             
             $(\'#cc-comicbody img\').addClass(\'cc-blur\');
@@ -1007,12 +1002,10 @@ class CC_Comic extends CC_Module{
 				$nextcomic = $this->getSeq("next");
 				$nextbutton = '<a class="cc-next" rel="next" href="' . $ccsite->root . $this->slug . '/' . $nextcomic['slug'] . $tagadd . '">' . $this->options['nexttext'] . '</a>';
 			}
-			
 			    //generate auxiliary button
 			$auxbutton = '<a class="cc-navaux" href="' . $ccsite->root . $this->options['navaux'] . '">' . $this->options['auxtext'] . '</a>';
 			
 			$buttonstring = "";
-			
 			    //fill out nav based on navorder
 			foreach($navarray as $button){
 				switch($button){
@@ -1256,7 +1249,7 @@ class CC_Comic extends CC_Module{
 	}
 	
 	//display a list of chapters in the archive
-	public function displayChapters($dropdown = false,$current = false, $parent = false){
+	public function displayChapters($dropdown = false, $current = false, $parent = false){
 		global $cc;
 		global $tableprefix;
 		global $lang;
@@ -1279,7 +1272,7 @@ class CC_Comic extends CC_Module{
 	}
 	
 	//recursive function to traverse the chapter tree
-	private function recurseChapters($tree,$dropdown,$current){
+	private function recurseChapters($tree, $dropdown, $current){
 		global $cc;
 		global $tableprefix;
 		global $ccuser;
@@ -1316,10 +1309,36 @@ class CC_Comic extends CC_Module{
                         if($arr['thumbnail'] != ""){ 
                             $thumbnail = $arr['thumbnail'];
                         }
-						echo '<div class="cc-storyline-thumb"><a href="' . $ccsite->root . $this->slug . '/' . $firstpage['slug'] . '"><img src="' . $ccsite->root . 'comicsthumbs/' . $thumbnail . '" /></a></div>';
+                        if($this->options['contentwarnings'] == "on" && !empty($firstpage['contentwarning'])){
+                            if(!isset($_COOKIE['warning_toggle'])){
+                                echo '
+                                <div title="Content Warning: '. str_replace('"', '&quote;', strip_tags($firstpage['contentwarning'])) .'" class="cc-storyline-thumb">
+                                <div class="cc-comicthumbnail">
+                                <a href="' . $ccsite->root . $this->slug . '/' . $firstpage['slug'] . '">
+                                <img src="' . $ccsite->root . 'comicsthumbs/' . $thumbnail . '" class="cc-blur" alt="Content Warning: '. str_replace('"', '&quote;', strip_tags($firstpage['contentwarning'])) .'">
+                                </a>
+                                <div class="cc-pagethumb-contentwarning">
+                                <span>Content Warning</span>
+                                </div>
+                                </div>';
+                            }else{
+                                echo '
+                                <div title="Content Warning: '. str_replace('"', '&quote;', strip_tags($firstpage['contentwarning'])) .'" class="cc-storyline-thumb">
+                                <div class="cc-comicthumbnail">
+                                <a href="' . $ccsite->root . $this->slug . '/' . $firstpage['slug'] . '">
+                                <img src="' . $ccsite->root . 'comicsthumbs/' . $thumbnail . '" class="sensitive" alt="Content Warning: '. str_replace('"', '&quote;', strip_tags($firstpage['contentwarning'])) .'">
+                                </a>
+                                <div class="cc-pagethumb-contentwarning">
+                                <span>Content Warning</span>
+                                </div>
+                                </div>';
+                            }
+                        }else{
+						    echo '<div class="cc-storyline-thumb"><a href="' . $ccsite->root . $this->slug . '/' . $firstpage['slug'] . '"><img src="' . $ccsite->root . 'comicsthumbs/' . $thumbnail . '" ></a></div>';
+                        }
 					}
                         //display the chapter name
-					$stmt->execute(['storyline' => $arr['id']]);
+					$stmt->execute(['storyline' => $arr['id'], 'comic' => $this->id]);
 					$pages = $stmt->fetchAll();
 					echo '<div class="cc-storyline-text"><div class="cc-storyline-header"><a href="' . $ccsite->root . $this->slug . '/' . $firstpage['slug'] . '">' . 
 					$arr['name'] . '</a></div>';
@@ -1336,9 +1355,42 @@ class CC_Comic extends CC_Module{
 					if($this->options['pagethumbs'] == "on"){
 						echo '<div class="cc-storyline-thumbwrapper">';
 						foreach($pages as $page){
-							echo '<div class="cc-storyline-pagethumb"><a href="' . $ccsite->root . $this->slug . '/' . $page['slug'] . '"><img src="' . $ccsite->root . 'comicsthumbs/' . $page['comicthumb'] . '" />';
-							if($this->options['pagetitles'] == "on") echo '<br /><br />' . $page['title'];
-							echo '</a></div>';
+						    if($this->options['contentwarnings'] == "on" && !empty($page['contentwarning'])){
+						        if(!isset($_COOKIE['warning_toggle'])){
+							        echo '
+							        <div title="Content Warning: '. str_replace('"', '&quote;', strip_tags($page['contentwarning'])) .'" class="cc-storyline-pagethumb">
+							        <div class="cc-comicthumbnail">
+                                    <a href="' . $ccsite->root . $this->slug . '/' . $page['slug'] . '">
+                                    <img loading="lazy" src="' . $ccsite->root . 'comicsthumbs/' . $page['comicthumb'] . '" class="cc-blur" alt="Content Warning: '. str_replace('"', '&quote;', strip_tags($firstpage['contentwarning'])) .'">
+                                    </a>
+                                    <div class="cc-pagethumb-contentwarning">
+                                    <span>Content Warning</span>
+                                    </div>
+                                    </div>';
+						        }else{
+						            echo '
+						            <div title="Content Warning: '. str_replace('"', '&quote;', strip_tags($page['contentwarning'])) .'" class="cc-storyline-pagethumb">
+						            <div class="cc-comicthumbnail">
+						            <a href="' . $ccsite->root . $this->slug . '/' . $page['slug'] . '">
+						            <img loading="lazy" src="' . $ccsite->root . 'comicsthumbs/' . $page['comicthumb'] . '" class="sensitive" alt="Content Warning: '. str_replace('"', '&quote;', strip_tags($firstpage['contentwarning'])) .'">
+						            </a>
+						            <div class="cc-pagethumb-contentwarning" style="background-color: transparent;">
+						            <span></span>
+						            </div>
+						            </div>';
+						        }
+						    }else{
+						        echo '
+						        <div class="cc-storyline-pagethumb">
+						        <div class="cc-comicthumbnail">
+						        <a href="' . $ccsite->root . $this->slug . '/' . $page['slug'] . '">
+						        <img loading="lazy" src="' . $ccsite->root . 'comicsthumbs/' . $page['comicthumb'] . '">
+						        </a></div>';
+						    }
+							if($this->options['pagetitles'] == "on"){
+                                echo '<span class="cc-pagethumb-title">' . $page['title'] . '</span>';
+							}
+							//echo '</a>';
 						}
 						echo '</div>';
 					}
