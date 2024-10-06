@@ -587,7 +587,7 @@ class CC_Comic extends CC_Module{
 		global $user_lang;
 			
 		$comic = $this->getComic();
-		$javscript = $this->comicJavascript($comic);
+		$javascript = $this->comicJavascript($comic);
 
 		function tagAdd(){ //adds tags 
 				  
@@ -626,7 +626,7 @@ class CC_Comic extends CC_Module{
 				echo '</a>';
 				
 				if(isset($javascript)){
-    				echo $script;
+    				echo $javascript;
 				}
 			}
 				//insert arrow key navigation if included
