@@ -21,7 +21,7 @@ require_once('comiccontrol/includes/dbconfig.php');
 require_once('comiccontrol/includes/initialize.php');
 
 //build the page
-$ccpage = new CC_Page("$_SERVER[REQUEST_URI]");
+$ccpage = new CC_Page($_SERVER['REQUEST_URI']);
 
 //include admin language if logged in
 if($ccuser->authlevel > 0){
@@ -39,7 +39,6 @@ if(file_exists('custom.php')) require_once('custom.php');
 
 //include template and build module
 require_once('templates/' . $ccpage->template);
-
 
 //close out the contents
 $contents = ob_get_contents();
@@ -60,13 +59,15 @@ if($ccuser->authlevel > 0){
 	switch($ccpage->moduletype){
 		case "comic":
 			$comicinfo = $ccpage->module->getComic();
-			if($comicinfo['publishtime'] > time()){
-				$previewbar .= $adminlang['PREVIEW'] . " - ";
-			}
-			$previewbar .= $comicinfo['comicname'] .'<a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '/add-post">' . $adminlang['Add'] . '</a> | <a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '/edit-post/' . $comicinfo['slug'] . '">' . $adminlang['Edit'] . '</a> | ';
+			if(!empty($comicinfo)){
+        			if($comicinfo['publishtime'] > time()){
+        				$previewbar .= $adminlang['PREVIEW'] . " - ";
+        			}
+    			    $previewbar .= $comicinfo['title'] . ' - <a tabindex="-1" href="' . $ccurl . 'modules/' . $ccpage->module->slug . '/add-post">' . $adminlang['Add'] . '</a> | <a tabindex="-1" href="' . $ccurl . 'modules/' . $ccpage->module->slug . '/edit-post/' . $comicinfo['slug'] . '">' . $adminlang['Edit'] . '</a> | ';
+    		    }
 			$previewbar .= '<a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '">' . str_replace('%s',$ccpage->title,$adminlang['Return to %s']) . '</a>';
 			$previewbar .= '</div></div>';
-			break;
+		break;
 		case "blog":
 			$bloginfo = $ccpage->module->getPost(getSlug(1));
 			if(!empty($bloginfo)){
@@ -74,29 +75,29 @@ if($ccuser->authlevel > 0){
 					$previewbar .= $adminlang['PREVIEW'] . " - ";
 				}
 				$previewbar .= $bloginfo['title'] . ' - ';
-				$previewbar .= $bloginfo['comicname'] .'<a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '/edit-post/' . $bloginfo['slug'] . '">' . $adminlang['Edit'] . '</a> | ';
+				$previewbar .= $ccpage->title .'<a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '/edit-post/' . $bloginfo['slug'] . '">' . $adminlang['Edit'] . '</a> | ';
 			}
 			$previewbar .= '<a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '/add-post">' . $adminlang['Add'] . '</a> | ';
 			$previewbar .= '<a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '">' . str_replace('%s',$ccpage->title,$adminlang['Return to %s']) . '</a>';
 			$previewbar .= '</div></div>';
-			break;
+		break;
 		case "gallery":
 			$previewbar .= '<a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '/add-post">' . $adminlang['Add'] . '</a> | ';
 			$previewbar .= '<a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '">' . str_replace('%s',$ccpage->title,$adminlang['Return to %s']) . '</a>';
 			$previewbar .= '</div></div>';
-			break;
+		break;
 		case "text":
 			$previewbar .= '<a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '">' . $adminlang['Edit'] . '</a>';
 			$previewbar .= '</div></div>';
-			break;
+		break;
 		default:
 			$previewbar .= '</div></div>';
-			break;
+		break;
 	}
 		
 	//include preview bar in output
-	$contents = str_replace('</head>',$script,$contents);
-	$contents = str_replace('<body>',$previewbar,$contents);
+	$contents = str_replace('</head>', $script, $contents);
+	$contents = str_replace('<body>', $previewbar, $contents);
 }
 
 echo $contents;
