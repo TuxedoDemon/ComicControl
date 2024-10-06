@@ -24,7 +24,7 @@ $user_lang['Comments'] = "Comments";
 $user_lang['Click to view comic transcript'] = "Click to view comic transcript";
 $user_lang["No posts were found with this tag."] = "No posts were found with this tag.";
 $user_lang['View more posts...'] = 'View more posts...';
-$user_lang['<br />Click to view this page'] = '<br />Click to view this page';
+$user_lang['Click to view this page.'] = 'Click to view this page.';
 $user_lang['Select a comic...'] = "Select a comic...";
 $user_lang['Page'] = 'Page';
 
