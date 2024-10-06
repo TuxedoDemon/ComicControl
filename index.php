@@ -63,8 +63,9 @@ if($ccuser->authlevel > 0){
         			if($comicinfo['publishtime'] > time()){
         				$previewbar .= $adminlang['PREVIEW'] . " - ";
         			}
-    			    $previewbar .= $comicinfo['title'] . ' - <a tabindex="-1" href="' . $ccurl . 'modules/' . $ccpage->module->slug . '/add-post">' . $adminlang['Add'] . '</a> | <a tabindex="-1" href="' . $ccurl . 'modules/' . $ccpage->module->slug . '/edit-post/' . $comicinfo['slug'] . '">' . $adminlang['Edit'] . '</a> | ';
+    			    $previewbar .= $comicinfo['title'] . ' - <a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '/edit-post/' . $comicinfo['slug'] . '">' . $adminlang['Edit'] . '</a> | ';
     		    }
+    			$previewbar .= ' <a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '/add-post">' . $adminlang['Add'] . '</a> | ';
 			$previewbar .= '<a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '">' . str_replace('%s',$ccpage->title,$adminlang['Return to %s']) . '</a>';
 			$previewbar .= '</div></div>';
 		break;
