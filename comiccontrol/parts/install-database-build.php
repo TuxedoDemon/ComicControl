@@ -31,10 +31,10 @@ if(!$failed){
 	//dbconfig.php - connects to database
 
 	//DATABASE INFO
-	$dbhost = "' . $dbhost . '";
-	$dbname = "' . $dbname . '";
-	$dblogin = "' . $dbuser . '";
-	$dbpass = "' . $dbpass . '";
+	$dbhost = \'' . $dbhost . '\';
+	$dbname = \'' . $dbname . '\';
+	$dblogin = \'' . $dbuser . '\';
+	$dbpass = \'' . $dbpass . '\';
 	$charset = "utf8mb4";
 
 	//CONNECT TO DATABASE
@@ -46,7 +46,7 @@ if(!$failed){
 		PDO::MYSQL_ATTR_FOUND_ROWS => true
 	];
 	$cc = new PDO($dsn, $dblogin, $dbpass, $opt);
-	$tableprefix = "' . $tableprefix . '";
+	$tableprefix = \'' . $tableprefix . '\';
 
 	?>';
 
