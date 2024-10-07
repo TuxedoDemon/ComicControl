@@ -1300,9 +1300,8 @@ class CC_Comic extends CC_Module{
 			
 			if(!($dropdown)){
 				//anchor for some sites to click quickly to chapters
-				echo '<a name="' . $arr['id'] . '"></a>';
+				echo '<a id="' . str_replace('---', '-', toSlug(trim($arr['name']))) . '-' . $arr['id'] . '"></a>';
 				if(!empty($firstpage)){
-					
 					//display the chapter thumbnail if options are set just so
 					if($this->options['pagethumbs'] == "off" && $this->options['chapterthumbs'] == "on"){
 						$thumbnail = $firstpage['comicthumb'];
@@ -1342,7 +1341,11 @@ class CC_Comic extends CC_Module{
 					$pages = $stmt->fetchAll();
 					echo '<div class="cc-storyline-text"><div class="cc-storyline-header"><a href="' . $ccsite->root . $this->slug . '/' . $firstpage['slug'] . '">' . 
 					$arr['name'] . '</a></div>';
-					if($arr['caption'] != "") echo '<div class="cc-storyline-caption">' . $arr['caption'] . '</div>';
+					
+					if($arr['caption'] != ""){
+					    echo '<div class="cc-storyline-caption">' . $arr['caption'] . '</div>';
+					}
+					
 					if($ccpage->module->options['pagetitles'] == "on" && $ccpage->module->options['pagethumbs'] == "off"){
 						echo '<div class="cc-storyline-pagetitles">';
 						foreach($pages as $page){
