@@ -27,7 +27,7 @@ if ($ccsite->sitetitle === null) {
         case "POST":
             if(isset($_POST['install-sitetitle']) && $_POST['install-sitetitle'] !== ""){
                 require_once('parts/install-site-build.php');
-                if ($ccsite->sitetitle !== "") {
+                if ($ccsite->sitetitle !== null) {
                     $redirect();
                 }
             }
