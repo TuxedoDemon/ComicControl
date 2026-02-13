@@ -3,7 +3,7 @@
 $options = array();
 
 $options['timezone'] = $_POST['install-timezone'];
-$options['sitetitle'] = $_POST['install-sitetitle'];
+$options['sitetitle'] = htmlspecialchars($_POST['install-sitetitle']);
 $options['commentname'] = $_POST['install-shortname'];
 $options['root'] = $_POST['install-siteroot'];
 $options['relativepath'] = $_POST['install-relativepath'];
@@ -16,7 +16,7 @@ $options['jquery'] = "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.
 $options['hammerjs'] = "https://ajax.googleapis.com/ajax/libs/hammerjs/2.0.8/hammer.min.js";
 $options['homepage'] = 1;
 $options['comments'] = "disqus";
-$options['description'] = $_POST['install-description'];
+$options['description'] = htmlspecialchars($_POST['install-description']);
 $options['updatechecked'] = 0;
 $options['newestversion'] = "4.2.9";
 
@@ -44,4 +44,3 @@ $root = $stmt->fetch();
 $htaccesstext = $prepend['content'] . PHP_EOL . $mainhtaccess['content'] . PHP_EOL . $append['content'];
 file_put_contents('../.htaccess', $htaccesstext);
 
-?>

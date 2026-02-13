@@ -4,6 +4,8 @@
 if($_POST['install-moduletype'] == "comic") $slugfinal = "comic";
 else{
 
+$_POST['install-pagetitle'] = htmlspecialchars($_POST['install-pagetitle']);
+
 //find available slug
 $slug = toSlug($_POST['install-pagetitle']);
 while(strpos($slug, '--') !== false){
