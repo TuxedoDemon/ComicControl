@@ -208,7 +208,7 @@ class CC_Page{
 	public $title = ""; //page title
 	public $moduletype = ""; //module type; custom if not just one module
 	public $template = ""; //template file location (within templates/)
-	public $user_language = ""; //language for this page
+	public $language = ""; //language for this page
 	public $slug = ""; //slug for the page
 	public $subslug = ""; //sub-slug; usually comic page title, archive, or search
 	public $searchterm = ""; //search term if a tag is selected
@@ -460,10 +460,10 @@ class CC_Module{
 		//output previous/next buttons for flipping through pages
 		echo '<div class="cc-prevnext">';
 		if($page > 1){
-			echo '<a href="' . $ccsite->root . $ccsite->relativeroot . $this->slug . '/' . $pagedir . '/' . ($page-1) . '">' . $user_lang['navprev'] . '</a>';
+			echo '<a href="' . $ccsite->root . $ccsite->relativepath . $ccpage->slug . '/' . $pagedir . '/' . ($page-1) . '">' . $user_lang['navprev'] . '</a>';
 		}
 		if($page < $numpages){
-			echo '<a href="' . $ccsite->root . $ccsite->relativeroot . $this->slug . '/' . $pagedir . '/' . ($page+1) . '">' . $user_lang['navnext'] . '</a>';
+			echo '<a href="' . $ccsite->root . $ccsite->relativepath . $ccpage->slug . '/' . $pagedir . '/' . ($page+1) . '">' . $user_lang['navnext'] . '</a>';
 		}
 		echo '</div>';
 		
@@ -473,17 +473,17 @@ class CC_Module{
 		echo '<div class="cc-pagelist">' . $user_lang["Page"] . ' ';
 		for($i=1; $i<=$numpages; $i++){
 			if($i < $page-4 && $ellipsis1 == false){
-				echo '<a href="' . $ccsite->root . $this->slug . '/' . $pagedir . '/1">1 ...</a> ';
+				echo '<a href="' . $ccsite->root . $ccpage->slug . '/' . $pagedir . '/1">1 ...</a> ';
 				$ellipsis1 = true;
 			}
 			if($page != $i && ($i >= $page-4 && $i < $page+4)){
-				echo '<a href="' . $ccsite->root . $this->slug . '/' . $pagedir .'/' . $i . '">' . $i . '</a> ';
+				echo '<a href="' . $ccsite->root . $ccpage->slug . '/' . $pagedir .'/' . $i . '">' . $i . '</a> ';
 			}
 			if($page == $i){
 				echo $i . ' ';
 			}
 			if($i >= $page+4 && $ellipsis2 == false){
-				echo '<a href="' . $ccsite->root . $this->slug . '/' . $pagedir . '/' . $numpages . '">... ' . $numpages . '</a>';
+				echo '<a href="' . $ccsite->root . $ccpage->slug . '/' . $pagedir . '/' . $numpages . '">... ' . $numpages . '</a>';
 				$ellipsis2 = true;
 			}
 		}
@@ -540,6 +540,7 @@ class CC_Comic extends CC_Module{
 	
 	public $id; //module id
 	public $name; //comic name
+    public $slug; // module slug
 	public $type = "comic"; //module type
 	public $options = array(); //comic options array
 	
@@ -1016,7 +1017,7 @@ class CC_Comic extends CC_Module{
 			//output news post based on whatever news is selected
 			echo '<div class="cc-newsarea">';
 			echo '<div class="cc-newsheader">';
-			if($ccpage->isindex) echo '<a href="' . $ccsite->root . $ccplug->slug . '/' . $news['slug'] . '">';
+			if($ccpage->isindex) echo '<a href="' . $ccsite->root . $ccpage->slug . '/' . $news['slug'] . '">';
 			echo $news['newstitle'];
 			if($ccpage->isindex) echo '</a>';
 			echo '</div>';
@@ -1394,6 +1395,8 @@ class CC_Gallery extends CC_Module{
 	
 	public $id; //module id
 	public $name; //module name
+    public $slug; // module slug
+    public $options; //module options
 	public $type = "gallery"; //module type
 	public $description;
 	
@@ -1470,6 +1473,7 @@ class CC_Blog extends CC_Module{
 	public $id; //module id
 	public $name; //module title
 	public $type = "blog"; //module type
+    public $slug; //module slug
 	public $options = array(); //options array
 	public $browsing = false; //boolean for keeping track if the user is looking at a list of posts or one post
 	
@@ -1572,6 +1576,7 @@ class CC_Blog extends CC_Module{
 		global $tableprefix;
 		global $cc;
 		global $ccsite;
+        global $user_lang;
 		
 		$query = "SELECT slug FROM cc_" . $tableprefix . "blogs WHERE blog=:blogid";
 		if($ccuser->authlevel == 0) $query .= " AND publishtime < " . time();
@@ -1601,7 +1606,7 @@ class CC_Blog extends CC_Module{
 			//output the post
 			echo '<article class="cc-blogpost">';
 			echo '<div class="cc-blogtitle">';
-			echo '<a href="' . $ccsite->root . $this->slug . '/' . $post['slug'] . '">' . $post['title'] . '</a></div>';
+			echo '<a href="' . $ccsite->root . $ccpage->slug . '/' . $post['slug'] . '">' . $post['title'] . '</a></div>';
 			echo '<div class="cc-blog-publishtime">' . str_replace('%t',date($ccsite->timeformat,$post['publishtime']),str_replace('%d',date($ccsite->dateformat,$post['publishtime']),$user_lang['Posted %d at %t'])) . '</div>';
 			echo '<div class="cc-blogcontent">' . $post['content'] . '</div>';
 			
@@ -1741,4 +1746,3 @@ class CC_Blog extends CC_Module{
 	
 }
 
-?>
