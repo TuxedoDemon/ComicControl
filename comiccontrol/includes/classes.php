@@ -116,7 +116,7 @@ class CC_User{
 		}
 		
 		//if the user has a login cookie, check it
-		else if(isset($_COOKIE['username']) && isset($_COOKIE['loginhash']) && isset($_COOKIE['hashtime'])){
+		else if(isset($_COOKIE['username']) && isset($_COOKIE['loginhash'])){
 			
 			
 			//assign inputs
@@ -151,7 +151,9 @@ class CC_User{
 		
 		global $cc;
 		global $tableprefix;
-		
+        $time = time();
+        $expires = $time + 432000;
+
 		//create login if not logged in
 		if($loginhash == 0){
 		
@@ -165,20 +167,26 @@ class CC_User{
 			//create the server-end hash and put it in the database if not already logged in
 			$sessionhash =  sha1($userinfo['username'] . $userinfo['salt'] . $loginhash);
 			$stmt = $cc->prepare("INSERT INTO cc_" . $tableprefix . "sessions(userid, loginhash, loginexpire) VALUES(:userid,:loginhash,:expire)");
-			$stmt->execute(['userid' => $userinfo['id'], 'loginhash' => $sessionhash, 'expire' => time() + (432000) ]);
+			$stmt->execute(['userid' => $userinfo['id'], 'loginhash' => $sessionhash, 'expire' => $expires]);
 		
 		}
 		
 		//update login if still logged in
 		else{
 			$stmt = $cc->prepare("UPDATE cc_" . $tableprefix . "sessions SET loginexpire=:expire WHERE userid=:userid AND loginhash=:loginhash LIMIT 1");
-			$stmt->execute(['userid' => $userinfo['id'], 'loginhash' => $sessionhash, 'expire' => time() + (432000) ]);
+			$stmt->execute(['userid' => $userinfo['id'], 'loginhash' => $sessionhash, 'expire' => $expires]);
 		}
 		
 		//set the user cookie
-		setcookie('loginhash', $loginhash, time() + (432000), "/", $_SERVER['HTTP_HOST']);
-		setcookie('username', $userinfo['username'], time() + (432000), "/", $_SERVER['HTTP_HOST']);
-		setcookie('hashtime', time(), time() + (432000), "/", $_SERVER['HTTP_HOST']);
+        $options = [
+            "path" => "/",
+            "expires" => $expires,
+            "httponly" => true,
+            "secure" => true,
+        ];
+
+		setcookie('loginhash', $loginhash, $options);
+		setcookie('username', $userinfo['username'], $options);
 		
 		//set that info within the object
 		$this->id = $userinfo['id'];

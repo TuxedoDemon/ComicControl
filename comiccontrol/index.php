@@ -58,17 +58,25 @@ unset($reload, $redirect, $reqmethod, $configfile, $install); // clean up instal
 $ccpage = new CC_Page($_SERVER["REQUEST_URI"], "admin");
 
 // delete cookies and session if logout requested, but only if the user is actually logged in at all.
+// TODO: Move this into the CC_User class and make it into a dedicated "logout" method. Probably also refactor the user class.
 if ($ccuser->authlevel > 0 && $ccpage->slugarr[1] === "logout") {
     $stmt = $cc->prepare("SELECT * FROM cc_" . $tableprefix . "users WHERE username=:username LIMIT 1");
     $stmt->execute(['username' => $ccuser->username]);
     $userinfo = $stmt->fetch();
     $loginhash = sha1($userinfo['username'] . $userinfo['salt'] . $ccuser->loginhash);
-    setcookie('username','hi',time()-3600, "/", $_SERVER['HTTP_HOST']);
-    setcookie('loginhash','hi',time()-3600, "/", $_SERVER['HTTP_HOST']);
-    setcookie('hashtime','hi',time()-3600, "/", $_SERVER['HTTP_HOST']);
+    $options = [
+        "path" => "/",
+        "expires" => 1,
+        "httponly" => true,
+        "secure" => true,
+    ];
+    foreach(['username', 'loginhash'] as $value){
+        setcookie($value, 'bye', $options);
+        unset($_COOKIE[$value]);
+    }
     $stmt = $cc->prepare("DELETE FROM cc_" . $tableprefix . "sessions WHERE userid=:userid AND loginhash=:loginhash");
     $stmt->execute(["userid" => $userinfo['id'], "loginhash" => $loginhash]);
-    echo '<script>window.location.href="' . $ccurl . '";</script>';
+    header("Location: {$ccurl}");
     exit;
 }
 

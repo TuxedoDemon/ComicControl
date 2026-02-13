@@ -98,7 +98,7 @@
 					echo '<a href="' . $ccurl . $navslug . '/">' . $lang['Plugins'] . '</a>';
 					break;
 				case "":
-					echo '<a href="' . $ccurl . $navslug . '/">' . $lang['Home'] . '</a>';
+					echo '<a href="' . $ccurl .'">' . $lang['Home'] . '</a>';
 					break;
 			}
 			
