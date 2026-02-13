@@ -5,154 +5,130 @@
 //start output buffering so we can set cookies whenever we feel like it
 ob_start();
 error_reporting(E_ALL & ~E_NOTICE);
+
 require_once('includes/formfunctions.php');
 
-//go through installation checks
-if(!file_exists('includes/dbconfig.php') && !isset($_POST['install-dbname'])){
-	require_once('parts/install-database.php');
-}else{
-	
-	if(isset($_POST['install-dbname']) && $_POST['install-dbname'] != ""){
-		require_once('parts/install-database-build.php');
-		if($failed){
-			require_once('parts/install-database.php');
-		}else{
-			require_once('parts/install-site.php');
-		}
-	}else{
-		
-		//initialize database and classes
-		require_once('includes/dbconfig.php');
-		
-		if(isset($_POST['install-sitetitle']) && $_POST['install-sitetitle'] != ""){
-			require_once('parts/install-site-build.php');
-		}
-		
-		require_once('includes/initialize.php');
-		
-		//install if no site title
-		if($ccsite->sitetitle == ""){
-			
-			require_once('parts/install-site.php');
-			
-		}else{
-			
-			if(isset($_POST['install-username']) && $_POST['install-username'] != ""){
-				require_once('parts/install-user-build.php');
-			}
-			
-			//check users
-			$query = "SELECT * FROM cc_" . $tableprefix . "users LIMIT 1";
-			$stmt = $cc->prepare($query);
-			$stmt->execute();
-			if($stmt->rowCount() < 1){
-				require_once('parts/install-user.php');
-			}
-			else{
+$reload = false;
+$reqmethod = strtoupper($_SERVER['REQUEST_METHOD']); // is also used in "populate-database.php"
+$configfile = file_exists('includes/dbconfig.php');
 
-				//include the user's language file; default is English
-				require_once('languages/' . $ccuser->language . '.php');
-			
-				if(isset($_POST['install-pagetitle']) && $_POST['install-pagetitle'] != ""){
-					require_once('parts/install-module-build.php');
-				}
+// INSTALL DATABASE
 
-				//check modules
-				$query = "SELECT * FROM cc_" . $tableprefix . "modules LIMIT 1";
-				$stmt = $cc->prepare($query);
-				$stmt->execute();
-				if($stmt->rowCount() < 1){
-					require_once('parts/install-module.php');
-				}else{
-					
-					//if there's a post variable indicating the installation is complete, give install complete message
-					if(isset($installed) && $installed = "complete"){
-						require_once('parts/install-complete.php');
-					}else{
-					
-						//build the page
-						$ccpage = new CC_Page("$_SERVER[REQUEST_URI]","admin");
+if(!$configfile) {
+    $reload = true;
+    switch($reqmethod){
+        case "GET":
+            require_once('parts/install-database.php');
+        return;
+        case "POST":
+            if(isset($_POST['install-dbname']) && $_POST['install-dbname'] !== ""){
+                require_once('parts/install-database-build.php');
+                // if the installation was unsuccessful, give the "install-database" form again. Else, set $configfile to true.
+                $failed ? require_once('parts/install-database.php') : $configfile = true;
+            }
+            // if there is no dbconfig file yet, do not load anything else beyond this point.
+            if (!$configfile) return;
+        break;
+        default:
+            http_response_code(405);
+            exit;
+    }
+}
 
-						//delete cookies and session if logout requested
-						if($ccpage->slugarr[1] == "logout"){
-							$stmt = $cc->prepare("SELECT * FROM cc_" . $tableprefix . "users WHERE username=:username LIMIT 1");
-							$stmt->execute(['username' => $ccuser->username]);
-							$userinfo = $stmt->fetch();
-							$loginhash = sha1($userinfo['username'] . $userinfo['salt'] . $ccuser->loginhash);
-							setcookie('username','hi',time()-3600, "/", $_SERVER['HTTP_HOST']);
-							setcookie('loginhash','hi',time()-3600, "/", $_SERVER['HTTP_HOST']);
-							setcookie('hashtime','hi',time()-3600, "/", $_SERVER['HTTP_HOST']);
-							$stmt = $cc->prepare("DELETE FROM cc_" . $tableprefix . "sessions WHERE userid=:userid AND loginhash=:loginhash");
-							$stmt->execute(["userid" => $userinfo['id'], "loginhash" => $loginhash]);
-							echo '<script>window.location.href="' . $ccurl . '";</script>';
-							exit();
-						}
+require_once('includes/dbconfig.php');
+require_once('includes/initialize.php');
 
-						//get navigation selection slug
-						$navslug = getSlug(1);
+// refreshes the page for the user throughout the rest of the installation process.
+$redirect = function () {
 
-						//create quick links array
-						$links = array();
+    global $ccurl;
 
-						//include page header
-						require_once('includes/header.php');
+    \header("Location: {$ccurl}");
+    exit;
 
-						//include login or password reset for non-authorized user
-						if($navslug == "password-reset"){
-							require_once('parts/password-reset.php');
-						}else if($ccuser->authlevel < 1){ 
-							require_once('parts/login.php');
-						}
+};
 
-						//build the sidebar and the top bar if authorized
-						else{	
-							require_once('includes/sidebar.php');
-							require_once('includes/breadcrumbs.php'); ?>
-							<section id="rightside">
-								<?php 
-									switch($navslug){
-									case "modules":
-										require_once('parts/module.php');
-										break;
-									case "image-library":
-										require_once('parts/image-library.php');
-										break;
-									case "site-options":
-										require_once('parts/site-options.php');
-										break;
-									case "manage-modules":
-										require_once('parts/manage-modules.php');
-										break;
-									case "users":
-										require_once('parts/users.php');
-										break;
-									case "templates":
-										require_once('parts/templates.php');
-										break;
-									case "update-check":
-										require_once('parts/update-check.php');
-										break;
-									case "upgrade":
-										require_once('parts/upgrade.php');
-										break;
-									case "plugins":
-										require_once('parts/plugins.php');
-										break;
-									default:
-										require_once('parts/home.php');
-										break;
-								}	?>	
-							</section>
-							<?php 
-						}
-					}
-				}
-			}
-		}
-	} 
+$reload && $redirect(); // refreshes the page to get the user out of $_SERVER['REQUEST_METHOD'] === "POST" mode before continuing installation
+require_once('parts/populate-database.php'); // run data checks, install things if they're missing
+if ($install) return; // if we're still installing, don't load anything else. Gets set in "populate-database.php".
+
+unset($reload, $redirect, $reqmethod, $configfile, $install); // clean up installation variables
+
+// build the page
+$ccpage = new CC_Page($_SERVER["REQUEST_URI"], "admin");
+
+// delete cookies and session if logout requested, but only if the user is actually logged in at all.
+if ($ccuser->authlevel > 0 && $ccpage->slugarr[1] === "logout") {
+    $stmt = $cc->prepare("SELECT * FROM cc_" . $tableprefix . "users WHERE username=:username LIMIT 1");
+    $stmt->execute(['username' => $ccuser->username]);
+    $userinfo = $stmt->fetch();
+    $loginhash = sha1($userinfo['username'] . $userinfo['salt'] . $ccuser->loginhash);
+    setcookie('username','hi',time()-3600, "/", $_SERVER['HTTP_HOST']);
+    setcookie('loginhash','hi',time()-3600, "/", $_SERVER['HTTP_HOST']);
+    setcookie('hashtime','hi',time()-3600, "/", $_SERVER['HTTP_HOST']);
+    $stmt = $cc->prepare("DELETE FROM cc_" . $tableprefix . "sessions WHERE userid=:userid AND loginhash=:loginhash");
+    $stmt->execute(["userid" => $userinfo['id'], "loginhash" => $loginhash]);
+    echo '<script>window.location.href="' . $ccurl . '";</script>';
+    exit;
+}
+
+//get navigation selection slug
+$navslug = getSlug(1);
+
+//create quick links array
+$links = array();
+
+//include page header
+require_once('includes/header.php');
+
+//include login or password reset for non-authorized user
+if ($ccuser->authlevel === 0) {
+    if ($navslug === "password-reset") {
+        require_once('parts/password-reset.php');
+        return;
+    }
+    require_once('parts/login.php');
+    return;
+}
+
+//build the sidebar and the top bar if authorized
+    require_once('includes/sidebar.php');
+    require_once('includes/breadcrumbs.php');
+    echo '<section id="rightside">';
+        switch($navslug){
+            case "modules":
+                require_once('parts/module.php');
+            break;
+            case "image-library":
+                require_once('parts/image-library.php');
+            break;
+            case "site-options":
+                require_once('parts/site-options.php');
+            break;
+            case "manage-modules":
+                require_once('parts/manage-modules.php');
+            break;
+            case "users":
+                require_once('parts/users.php');
+            break;
+            case "templates":
+                require_once('parts/templates.php');
+            break;
+            case "update-check":
+                require_once('parts/update-check.php');
+            break;
+            case "upgrade":
+                require_once('parts/upgrade.php');
+            break;
+            case "plugins":
+                require_once('parts/plugins.php');
+            break;
+            default:
+                require_once('parts/home.php');
+    }
+    echo '</section>';
 
 	//include the page footer
 	require_once('includes/footer.php'); 
-}
+
 ob_end_flush();
-?>

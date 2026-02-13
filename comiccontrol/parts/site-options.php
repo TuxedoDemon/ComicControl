@@ -58,10 +58,10 @@ if(isset($_POST) && $_POST['sitetitle'] != ""){
 }
 
 //get main page and all modules
-$stmt = $cc->prepare("SELECT * FROM cc_" . $ccsite->tableprefix . "options WHERE optionname='homepage' LIMIT 1");
+$stmt = $cc->prepare("SELECT * FROM cc_" . $tableprefix . "options WHERE optionname='homepage' LIMIT 1");
 $stmt->execute();
 $mainpage = $stmt->fetch();
-$stmt = $cc->prepare("SELECT * FROM cc_" . $ccsite->tableprefix . "modules WHERE id=:id LIMIT 1");
+$stmt = $cc->prepare("SELECT * FROM cc_" . $tableprefix . "modules WHERE id=:id LIMIT 1");
 $stmt->execute(['id' => $mainpage['optionvalue']]);
 $main = $stmt->fetch();
 $query = "SELECT * FROM cc_" . $tableprefix . "modules ORDER BY id ASC";

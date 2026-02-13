@@ -5,16 +5,17 @@
 //CC_Site - holds overall site options
 class CC_Site{
 	
+    public $tableprefix; //tableprefix
 	public $timezone; //site timezone
 	public $sitetitle; //overall site title
-	public $commentuser; //username for comments service
+	public $commentname; //username for comments service
 	public $root; //the root URL without any extra paths
 	public $relativepath; //a relative path is the CC install is not at in base directory
 	public $ccroot; //the path that CC is at, usually comiccontrol/
 	public $dateformat; //format string for dates
 	public $timeformat; //format string for times
 	public $version; //version number for CC
-	public $user_language; //overall language for site
+	public $language; //overall language for site
 	public $jquery; //URL for jquery inclusion
 	public $hammerjs; //URL for hammer.js inclusion
 	public $description; //default meta description
