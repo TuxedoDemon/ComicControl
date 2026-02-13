@@ -53,7 +53,7 @@ if(!$failed){
 	file_put_contents('includes/dbconfig.php',$dbconfigtxt);
 	include('includes/dbconfig.php');
 	
-	$sqlquery = file_get_contents("install.sql", true);
+	$sqlquery = file_get_contents("install.sql");
 	$sqlquery = str_replace("_temp_","_" . $tableprefix, $sqlquery);
 	
 	$cc->setAttribute(PDO::ATTR_EMULATE_PREPARES, 0);
