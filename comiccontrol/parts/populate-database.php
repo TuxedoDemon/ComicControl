@@ -23,7 +23,7 @@ if ($ccsite->sitetitle === null) {
     switch($reqmethod) {
         case "GET":
             require_once('parts/install-site.php');
-        return;
+        return; // we are using returns throughout this instead of breaks so that when an installation form is included, the next one doesn't also get included.
         case "POST":
             if(isset($_POST['install-sitetitle']) && $_POST['install-sitetitle'] !== ""){
                 require_once('parts/install-site-build.php');
