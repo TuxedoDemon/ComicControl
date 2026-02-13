@@ -27,9 +27,7 @@ if ($ccsite->sitetitle === null) {
         case "POST":
             if(isset($_POST['install-sitetitle']) && $_POST['install-sitetitle'] !== ""){
                 require_once('parts/install-site-build.php');
-                if ($ccsite->sitetitle !== null) {
-                    $redirect();
-                }
+                ($ccsite->sitetitle !== null) ? $redirect() : require_once('parts/install-site.php');
             }
         return;
         default:
@@ -52,9 +50,7 @@ if ($userCheck < 1) { // user check
         case "POST":
             if(isset($_POST['install-username']) && $_POST['install-username'] !== ""){
                 require_once('parts/install-user-build.php');
-                if($getRowCount("users") >= 1){
-                    $redirect();
-                }
+                ($getRowCount("users") >= 1) ? $redirect() : require_once('parts/install-user.php');
             }
         return;
         default:
@@ -79,6 +75,8 @@ if ($moduleCheck < 1) { // module check
                 if($getRowCount("modules") >= 1){
                     // if there's a variable indicating the installation is complete, give install complete message
                     if (isset($installed) && $installed === "complete") require_once('parts/install-complete.php');
+                } else {
+                    require_once('parts/install-module.php');
                 }
             }
         return;
