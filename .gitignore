@@ -2,3 +2,6 @@ dbconfig.php
 .vscode
 .vscode/settings.json
 .htaccess
+comicshighres/*
+comicsthumbs/*
+comics/*
