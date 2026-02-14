@@ -25,13 +25,15 @@ quickLinks($links);
 <?php 
 
 //get the text content
-$query = "SELECT * FROM cc_" . $tableprefix . "text WHERE id=:id";
+$query = <<<SQL
+SELECT * FROM cc_{$tableprefix}text AS text JOIN cc_{$tableprefix}modules AS modules WHERE text.id=modules.id AND modules.id=:id LIMIT 1
+SQL;
 $stmt = $cc->prepare($query);
 $stmt->execute(['id' => $ccpage->module->id]);
 $text = $stmt->fetch();
 
 //submit content if posted
-if(isset($_POST) && $_POST['submitted'] != ""){
+if($_SERVER['REQUEST_METHOD'] === "POST" && ($_POST['submitted'] ?? "") !== ""){
 	
 	//set values for the query 
 	$content = $_POST['text-content'];
@@ -45,7 +47,7 @@ if(isset($_POST) && $_POST['submitted'] != ""){
 	if($stmt->rowCount() > 0){
 		
 		?>
-		<div class="msg success f-c"><?=str_replace('%s',$title,$lang['Your changes have been saved.'])?></div>
+		<div class="msg success f-c"><?=str_replace('%s', $text['title'], $lang['%s has been successfully edited.'])?></div>
 		<?php		
 		
 		//get the edited text
@@ -58,7 +60,7 @@ if(isset($_POST) && $_POST['submitted'] != ""){
 	//output error message if failed
 	else{
 		?>
-		<div class="msg error f-c"><?=$lang['There was an error editing your text page.  Please try again.']?></div>
+		<div class="msg error f-c"><?=$lang['There was an error editing your text page. Please try again.']?></div>
 		<?php
 	}
 	
@@ -66,15 +68,14 @@ if(isset($_POST) && $_POST['submitted'] != ""){
 
 //output the form for editing the text ?>
 
-<h2><?=str_replace("%s",$ccpage->title,$lang['Editing <i>%s</i>'])?></h2>
+<h2><?=str_replace("%s", $ccpage->title, $lang['Editing <i>%s</i>'])?></h2>
 
 <form action="" method="post">
 		
 	<input type="hidden" value="submitted" name="submitted" />	
-		
 	<div class="formcontain">
 		<?php
-			buildTextEditor($lang['Text content'],"text-content",$lang['tooltip-textcontent'],$text['content']);
+			buildTextEditor($lang['Text content'], "text-content", $lang['tooltip-textcontent'], $text['content']);
 		?>
 	</div>
 	

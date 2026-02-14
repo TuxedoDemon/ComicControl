@@ -29,7 +29,7 @@ quickLinks($links);
 <?php
 
 //submit page if posted
-if(isset($_POST) && $_POST['storyline-title'] != ""){
+if(isset($_POST) && ($_POST['storyline-title'] ?? "") !== ""){
 
 	//set values for the query
 	$name = $_POST['storyline-title'];
@@ -41,8 +41,9 @@ if(isset($_POST) && $_POST['storyline-title'] != ""){
 	$comic = $ccpage->id;
 	
 	//get information about parent storyline
-	if($parent == 0) $level = 0;
-	else{
+	if($parent === 0) {
+        $level = 0;
+    }else{
 		$query = "SELECT * FROM cc_" . $tableprefix . "comics_storyline WHERE id=:parent";
 		$stmt = $cc->prepare($query);
 		$stmt->execute(['parent' => $parent]);
@@ -73,9 +74,6 @@ if(isset($_POST) && $_POST['storyline-title'] != ""){
 		?>
 		<div class="msg success f-c"><?=str_replace('%s',$name,$lang['%s has been successfully added.'])?></div>
 		<?php		
-		if($error != false){
-			?><div class="msg error f-c"><?=$error?></div><?php
-		}
 		echo '<div class="cc-btn-row">';
 		buildButton(
 			"light-bg",
@@ -102,7 +100,7 @@ if(isset($_POST) && $_POST['storyline-title'] != ""){
 
 		//check storyline is set
 		$storyline = 0;
-		if(filter_var($ccpage->slugarr[4], FILTER_VALIDATE_INT)) $storyline = $ccpage->slugarr[4];
+		if(filter_var($ccpage->slugarr[4] ?? "", FILTER_VALIDATE_INT)) $storyline = $ccpage->slugarr[4];
 		
 		//build array of form info
 		$forminputs = array();
@@ -126,13 +124,14 @@ if(isset($_POST) && $_POST['storyline-title'] != ""){
 					'needsparent' => true
 				)
 			),array(
-							array(
-								'type' => "text",
-								'label' => $lang['Storyline caption'],
-								'name'=> "storyline-caption",
-								'current' => $thisstoryline['caption']
-							)
-						)
+                array(
+                    'type' => "text",
+                    'label' => $lang['Storyline caption'],
+                    'tooltip' => $lang['tooltip-storylinecaption'],
+                    'name'=> "storyline-caption",
+                    'current' => $thisstoryline['caption'] ?? ""
+                )
+            )
 		);
 
 		//build the form

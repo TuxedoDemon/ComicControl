@@ -42,7 +42,7 @@ if(empty($post)){
 else{
 
 	//submit page if posted
-	if(isset($_POST) && $_POST['post-title'] != ""){
+	if($_SERVER['REQUEST_METHOD'] === "POST" && ($_POST['post-title'] ?? "") !== ""){
 		
 		//set values for the query 
 		$blog = $ccpage->module->id;
@@ -68,15 +68,17 @@ else{
 			$tags = explode(",",$tags);
 			$stmt = $cc->prepare("INSERT INTO cc_" . $tableprefix . "blogs_tags(blog,blogid,tag,publishtime) VALUES(:moduleid,:postid,:tag,:publishtime)");
 			foreach($tags as $tag){
-				$tag = trim($tag);
-				if($tag != ""){
+				$tag = trim(toSlug($tag));
+                $tag = strip_tags($tag);
+                $tag = htmlspecialchars($tag);
+				if($tag !== ""){
 					$stmt->execute(['moduleid' => $blog, 'postid' => $post['id'], 'tag' => $tag, 'publishtime' => $publishtime]);
 				}
 			}
 			
 			//output success message
 			?>
-			<div class="msg success f-c"><?=str_replace('%s',$title,$lang['%s has been successfully edited.'])?></div>
+			<div class="msg success f-c"><?=str_replace('%s', $title, $lang['%s has been successfully edited.'])?></div>
 			<?php		
 			echo '<div class="cc-btn-row">';
 			buildButton(

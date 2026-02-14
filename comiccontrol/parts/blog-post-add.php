@@ -32,7 +32,7 @@ quickLinks($links);
 <?php 
 
 //submit post if submitted
-if(isset($_POST) && $_POST['post-title'] != ""){
+if($_SERVER['REQUEST_METHOD'] === "POST" && ($_POST['post-title'] ?? "") !== ""){
 	
 	//set values for the query 
 	$blog = $ccpage->module->id;

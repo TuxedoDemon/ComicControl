@@ -38,7 +38,7 @@ if($stmt->rowCount() < 1){
 }else{
 
 //submit page if posted
-if(isset($_POST) && $_POST['comic-title'] != ""){
+if($_SERVER['REQUEST_METHOD'] === "POST" && ($_POST['comic-title'] ?? "") !== ""){
 	
 	//set values for the query 
 	$comic = $ccpage->module->id;
@@ -50,14 +50,14 @@ if(isset($_POST) && $_POST['comic-title'] != ""){
 	$title = $_POST['comic-title'];
 	$newstitle = $_POST['news-title'];
 	$newscontent = trim($_POST['news-content']);
-	$transcript = $_POST['comic-transcript'];
+	$transcript = $_POST['comic-transcript'] ?? null;
 	$storyline = $_POST['comic-storyline'];
 	$hovertext = $_POST['comic-hovertext'];
 	$imginfo = getimagesize('../comicshighres/' . $comichighres);
 	$width = $imginfo[0];
 	$height = $imginfo[1];
 	$mime = $imginfo['mime'];
-	$contentwarning = $_POST['comic-content-warning'];
+	$contentwarning = $_POST['comic-content-warning'] ?? null;
 	$altnext = $_POST['comic-alternative-link'];
 	
 	//find available slug
@@ -162,7 +162,7 @@ if(isset($_POST) && $_POST['comic-title'] != ""){
 			<?php
 				//check storyline is set
 				$storyline = 0;
-				if(filter_var($_POST['storyline'], FILTER_VALIDATE_INT)) $storyline = $_POST['storyline'];
+				if(filter_var(($_POST['storyline'] ?? ""), FILTER_VALIDATE_INT)) $storyline = $_POST['storyline'];
 
 				//build array of form info
 				$forminputs = array();
@@ -212,7 +212,8 @@ if(isset($_POST) && $_POST['comic-title'] != ""){
 							'tooltip' => $lang['tooltip-storyline'],
 							'name' => "comic-storyline",
 							'regex' => "storyline",
-							'current' => $storyline
+							'current' => $storyline,
+                            'needsparent' => true,
 						)
 					)
 				);

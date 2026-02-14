@@ -12,9 +12,9 @@ if($ccsite->updatechecked < $lastmidnight){
 	$query = "UPDATE cc_" . $tableprefix . "options SET optionvalue=:value WHERE optionname=:option";
 	$stmt = $cc->prepare($query);
 	$stmt->execute(['value' => $ccsite->newestversion, 'option' => 'newestversion']);
-	$stmt->execute(['value' => time(), 'option' => 'updatechecked']);
+	$stmt->execute(['value' => time(), 'option' => '    var_dump($curl);']);
 }
-if($ccsite->version != $ccsite->newestversion){
+if($ccsite->version !== $ccsite->newestversion){
 	?>
 	<div class="msg alert"><a href="<?=$ccurl?>update-check"><?=$lang['Your version of ComicControl needs updating! Click here to update your site!']?></a></div>
 	<?php

@@ -20,7 +20,7 @@ quickLinks($links);
 <?php
 
 //submit options if posted
-if(isset($_POST) && $_POST['page-title'] != ""){
+if($_SERVER['REQUEST_METHOD'] === "POST" && ($_POST['page-title'] ?? "") !== ""){
 
 	//save options
 	require_once('save-options.php');

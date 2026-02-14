@@ -9,12 +9,12 @@ function buildFormInput($options){
 	extract($options);
 	if(!isset($current)) $current = "";
 	if(!isset($regex)) $regex = "";
-	
+
 	//display input label
 	echo '<div class="forminput"><label><div class="v-c">' . $label . ':';
 	if($regex) echo ' *'; //output asterisk if required field
 	echo '</div></label>';
-	
+
 	//put in a text input element if a date or text input
 	if($type == "text" || $type == "date" || $type == "password"){
 		echo '<input type="';
@@ -72,15 +72,15 @@ function buildFormInput($options){
 		echo '</select></div>';
 		
 	}
-	else if($type=="storylines"){
-		$ccpage->module->displayChapters(true,htmlspecialchars($current),$needsparent);
-	}else if($type=="editor"){
+	else if($type === "storylines"){
+		$ccpage->module->displayChapters(true, htmlspecialchars($current), $needsparent);
+	}else if($type === "editor"){
 		buildTextEditor($name);
-	}else if($type=="select"){
+	}else if($type === "select"){
 		echo '<select name="' . $name . '">';
 		foreach($options as $key => $value){
 			echo '<option value="' . $key . '"';
-			if($key == htmlspecialchars($current)) echo ' SELECTED';
+			if($key === htmlspecialchars($current)) echo ' SELECTED';
 			echo '>' . $value . '</option>';
 		}
 		echo '</select>';
@@ -118,7 +118,7 @@ function buildTextArea($label,$name,$tooltip,$current = ""){
 }
 
 //output a text editor
-function buildTextEditor($label,$name,$tooltip,$current = ""){
+function buildTextEditor($label, $name, $tooltip, $current = ""){
 
 	//create header for content editor ?>
 	<div class="formtext"><label><div class="v-c"><?=$label?>:</div><div class="tooltip"><a class="f-c">?</a><div class="tooltip-help"><div class="tooltip-triangle"></div><?=$tooltip?></div></div></label>

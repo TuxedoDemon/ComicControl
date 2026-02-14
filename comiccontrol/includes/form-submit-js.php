@@ -57,7 +57,7 @@ $("#submitform").on('click', function(){
 				case 'prefix':
 					var regexprefix = /^[a-z0-9_]{1,7}$/i;
 					if(!regexprefix.test($(this).val())){
-						showError($forminput,'<?=$ilang['error-prefix']?>');
+						showError($forminput,'<?=$lang['error-prefix']?>');
 						error = true;
 					}
 					break;

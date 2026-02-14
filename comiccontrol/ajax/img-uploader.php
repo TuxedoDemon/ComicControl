@@ -26,7 +26,7 @@ if($ccuser->authlevel > 0){
 	if(getSlug(1) == "users") $isavatar = true;
 		
 	//generic function for uploading images and returning info
-	function uploadImage($tmpimage,$uploadsDirectory,$filename,$returnData,$maxw,$maxh,$returnkey){
+	function uploadImage($tmpimage, $uploadsDirectory, $filename, $returnData, $maxw, $maxh, $returnkey){
 
 		if(!($source = imagecreatefromstring(file_get_contents($tmpimage)))){
 			$returnData['error'] = 1;
@@ -69,14 +69,14 @@ if($ccuser->authlevel > 0){
 			}else{
 			
 				//resize image and move file to new location
-				if(!($slate = imagecreatetruecolor($w, $h))) $returnData['error'] = 1;
+				if(!($slate = imagecreatetruecolor((int)$w, (int)$h))) $returnData['error'] = 1;
 				else{
 					if($type == "gif" or $type == "png"){
 						imagecolortransparent($slate, imagecolorallocatealpha($slate, 0, 0, 0, 127));
 						imagealphablending($slate, false);
 						imagesavealpha($slate, true);
 					}
-					imagecopyresampled($slate, $source, 0, 0, 0, 0, $w, $h, $x, $y);
+					imagecopyresampled($slate, $source, 0, 0, 0, 0, (int)$w, (int)$h, $x, $y);
 					switch($type){
 						case 'bmp': imagewbmp($slate, $uploadFilename); break;
 						case 'gif': imagegif($slate, $uploadFilename); break;
@@ -84,7 +84,7 @@ if($ccuser->authlevel > 0){
 						case 'png': imagepng($slate, $uploadFilename, 9); break;
 					}
 					$returnData[$returnkey] = $finalfile;
-					imagedestroy($slate);
+					unset($slate);
 				}
 			}
 				

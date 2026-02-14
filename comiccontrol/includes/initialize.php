@@ -10,6 +10,7 @@ require_once('classes.php');
 //create objects
 $ccsite = new CC_Site();
 $ccuser = new CC_User();
+
 date_default_timezone_set($ccsite->timezone);
 
 //quick access URL string

@@ -28,7 +28,7 @@ quickLinks($links);
 <?php
 
 //submit page if posted
-if(isset($_POST) && $_POST['storyline-title'] != ""){
+if($_SERVER['REQUEST_METHOD'] === "POST" && ($_POST['storyline-title'] ?? "") !== ""){
 	
 	$error = false;
 	
@@ -107,14 +107,11 @@ if(isset($_POST) && $_POST['storyline-title'] != ""){
 		?>
 		<div class="msg success f-c"><?=str_replace('%s',$name,$lang['%s has been successfully edited.'])?></div>
 		<?php		
-		if($error != false){
-			?><div class="msg error f-c"><?=$error?></div><?php
-		}
 		echo '<div class="cc-btn-row">';
 		buildButton(
 			"light-bg",
 			$ccurl . $navslug . '/' . $ccpage->module->slug . '/edit-storyline/' . $thisstoryline['id'],
-			str_replace('%s',htmlentities($title),$lang['Edit %s again'])
+			str_replace('%s', htmlentities($thisstoryline['name']) , $lang['Edit %s again'])
 		);
 		echo '</div>';
 		
@@ -183,6 +180,7 @@ if(isset($_POST) && $_POST['storyline-title'] != ""){
 							array(
 								'type' => "text",
 								'label' => $lang['Storyline caption'],
+                                'tooltip' => $lang['tooltip-storylinecaption'],
 								'name'=> "storyline-caption",
 								'current' => $thisstoryline['caption']
 							)

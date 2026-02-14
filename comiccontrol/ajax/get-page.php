@@ -5,7 +5,7 @@ require_once('../includes/dbconfig.php');
 require_once('../includes/initialize.php');
 
 //check user authorization
-if($ccuser->authlevel > 0){
+if($ccuser->authlevel > 0 && $_SERVER['REQUEST_METHOD'] === "POST"){
 
 	//get action type
 		//action types: comic, blog, gallery, media
@@ -16,7 +16,7 @@ if($ccuser->authlevel > 0){
 	//sanitize all inputs
 		//sanitize expected parts of received object that will be put into PHP query (module id, page number, storyline id)
 	if($action == "storyline"){
-		$searchid = filter_var($_POST['storyline'], FILTER_SANITIZE_NUMBER_INT);	
+		$searchid = filter_var(($_POST['storyline'] ?? 0), FILTER_SANITIZE_NUMBER_INT);	
 	}else{
 		$searchid = filter_var($_POST['pagenum'], FILTER_SANITIZE_NUMBER_INT);	
 		$lowerlimit = 20 * ($searchid-1);
@@ -61,9 +61,9 @@ if($ccuser->authlevel > 0){
 			$query = $cc->prepare("SELECT * FROM cc_" . $tableprefix . "comics_storyline WHERE id=:searchid");
 			$query->execute(['searchid'=>$searchid]);
 			$thisstoryline = $query->fetch();
-			if($thisstoryline['parent'] > 0)  $returnData['parent'] = $thisstoryline['parent'];
+			if(($thisstoryline['parent'] ?? 0) > 0)  $returnData['parent'] = $thisstoryline['parent'];
 			else $returnData['parent'] = 0;
-			if($thisstoryline['id'] > 0) $returnData['heading'] = $thisstoryline['name'];
+			if(($thisstoryline['id'] ?? 0) > 0) $returnData['heading'] = $thisstoryline['name'];
 			else $returnData['heading'] = '';
 			$query = $cc->prepare("SELECT * FROM cc_" . $tableprefix . "comics WHERE storyline=:searchid AND comic=:moduleid ORDER BY publishtime ASC");
 			$query->execute(['searchid' => $searchid, 'moduleid' => $moduleid]);

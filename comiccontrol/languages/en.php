@@ -203,6 +203,7 @@ $lang['error-normaltext'] = 'This field must have at least one character.';
 $lang['error-date'] = 'Dates must be in mm/dd/yyyy format.';
 $lang['error-file'] = 'You must upload a file here.';
 $lang['error-int'] = 'This field must be a positive integer.';
+$lang['error-prefix'] = "This prefix must be no more than 7 characters in length, made up of only letters, numbers, and underscores. It cannot be blank.";
 $lang['No comic was found with this information.'] = 'No comic was found with this information.';
 
 //content-editor-js.php & img-upload-js.php
@@ -222,6 +223,7 @@ $lang['tooltip-newscontent'] = "This is the content of the news post associated 
 $lang['tooltip-storyline'] = 'This is the chapter that your comic page will be listed in.  If you have not created any chapters, the page will be listed as "uncategorized" when created.';
 $lang['tooltip-transcript'] = "You may enter a transcript of your comic page here.  It will be displayed with your news post.";
 $lang['tooltip-storylinetitle'] = "This will be the name of the storyline.  The storyline name must have at least one number or letter character.";
+$lang['tooltip-storylinecaption'] = 'This caption will be shown below your comic\'s title when viewed in the comic archive.';
 $lang['tooltip-parentstoryline'] = "This will be the parent storyline of the created storyline.  If a parent storyline is selected, this storyline will be a sub-storyline of the parent storyline.  For example, a chapter can be created with a volume as a parent storyline.";
 
 //page option tooltips
