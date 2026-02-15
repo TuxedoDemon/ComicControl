@@ -1,6 +1,8 @@
 <?php
-include('templates/basic/includes/header.php'); ?>
+include('templates/basic/includes/header.php');
 
-<?php $ccpage->module->display(); ?>
+($ccpage->module->type === "blog" && $ccpage->subslug === "rss") 
+? include(include($ccsite->ccroot . 'parts/comic-rss.php')) 
+: $ccpage->module->display(); 
 
-<?php include('templates/basic/includes/footer.php'); ?>
+include('templates/basic/includes/footer.php');

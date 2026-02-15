@@ -375,37 +375,29 @@ class CC_Page{
 		}
 		
 		//if there's extra info, add that to the title
-		if($this->moduletype == "comic" || ($this->moduletype == "blog" && $this->subslug != "")){
-			
+		if ($this->moduletype == "comic" || ($this->moduletype == "blog" && $this->subslug != "")) {
 			if(!$hyphen) echo ' - ';
-			
-			if($this->subslug == "archive"){
-				echo $user_lang['Archive'];
-			}
-			
-			else if($this->subslug == "search"){
-				echo $user_lang['Search'] . ' - ' . urldecode($this->searchterm);
-			}
-			
-			else if($this->subslug == "filter"){
-				echo urldecode($this->searchterm);
-			}
-			
-			else if($this->subslug == "page"){
-				echo str_replace('%n', $this->pagenum, $user_lang['Page %n']);
-			}
-			
-			//if slug is assigned, get comic or blog title
-			else{
-				if($this -> isindex){
-					$post = $this->module->getSeq("last");
-				}else{
-					$post = $this->module->getPost($this->subslug);
-				}
-				echo $post['title'];
-			}
+			switch ($this->subslug) {
+                case "archive":
+                    echo $user_lang['Archive'];
+                break;
+                case "search":
+                    echo $user_lang['Search'] . ' - ' . urldecode($this->searchterm);
+                break;
+                case "filter":
+                    echo urldecode($this->searchterm);
+                break;
+                case "page":
+                    echo str_replace('%n', $this->pagenum, $user_lang['Page %n']);
+                break;
+                default:
+                    //if slug is assigned, get comic or blog title
+                    $post = $this->isindex ? $this->module->getSeq("last") : $this->module->getPost($this->subslug);
+                    echo $post['title'] ?? "";
+            }
 		}
 	}
+
 	public function displayMeta(){
 		
 		global $ccsite;
@@ -706,7 +698,7 @@ class CC_Comic extends CC_Module{
 
 				//check to add tag reading portion of URL
 				$tagadd = "";
-				if($ccpage->slugarr[2] == "read-tag"){
+				if(($ccpage->slugarr[2] ?? "") === "read-tag"){
 					$tagadd = "/read-tag/" . $ccpage->slugarr[3];
 				}
 
@@ -1608,7 +1600,7 @@ class CC_Blog extends CC_Module{
 		//get the post
 		$post = $this->getPost($slug);
 		
-		if($post['title'] != ""){
+		if(($post['title'] ?? "") !== ""){
 			
 			//output the post
 			echo '<article class="cc-blogpost">';

@@ -6,11 +6,10 @@ if($ccuser->authlevel != 2){
 	echo '<div class="msg error f-c">' . $lang['You do not have permission to access this page.'] . '</div>';
 }else{
 //set template currently being edited
-$template = "";
-$template = $_POST['page-template'];
+$template = $_POST['page-template'] ?? "";
 
-//if template was submitted, save teh changes
-if(isset($_POST) && $_POST['templatechange'] != ""){
+//if template was submitted, save the changes
+if($_SERVER['REQUEST_METHOD'] === "POST" && ($_POST['templatechange'] ?? "") !== ""){
 	
 	//save the changes to the file
 	if(file_put_contents('../templates/' . $_POST['templatechange'], $_POST['templatecontent'])){

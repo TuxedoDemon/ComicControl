@@ -1,6 +1,6 @@
 <?php
 //rss switch
-if($ccpage->subslug == "rss"){ 
+if($ccpage->subslug === "rss"){ 
 
 	include($ccsite->ccroot . 'parts/comic-rss.php');
 	

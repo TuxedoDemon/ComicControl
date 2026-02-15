@@ -2,7 +2,7 @@
 
 //image-library.php - manages all functions for the image library
 
-if($ccuser->authlevel != 2){
+if($ccuser->authlevel !== 2){
 	echo '<main id="content"><div class="msg error f-c">' . $lang['You do not have permission to access this page.'] . '</div>';
 }else{
 //handle image deletion
@@ -75,7 +75,7 @@ if(getSlug(2) == "delete-image"){
 	?><script src="//cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.2/jquery.form.js" type="text/javascript" /></script><?php
 
 	//submit image if posted
-	if(isset($_POST) && $_POST['image-finalfile'] != ""){
+	if($_SERVER['REQUEST_METHOD'] === "POST" && ($_POST['image-finalfile'] ?? "") !== ""){
 		
 		//set values for the query 
 		$imgname = $_POST['image-finalfile'];

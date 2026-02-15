@@ -4,9 +4,7 @@ header("Content-Type: application/xml; charset=UTF-8");
 
 //some cleanup functions
 function selfURL() {
-	$s = empty($_SERVER["HTTPS"]) ? ''
-		: ($_SERVER["HTTPS"] == "on") ? "s"
-		: "";
+    $s = (empty($_SERVER["HTTPS"]) ? '' : ($_SERVER["HTTPS"] == "on")) ? "s" : "";
 	$protocol = strleft(strtolower($_SERVER["SERVER_PROTOCOL"]), "/").$s;
 	return $protocol."://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
 }
