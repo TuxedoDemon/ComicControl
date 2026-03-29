@@ -28,8 +28,8 @@ catch( PDOException $error ) {
 if(!$failed){
 
 	$creds = [$dbhost, $dbname, $dbuser, $dbpass];
-    $creds = str_replace('$', "\\$", $creds); // escaping any dollar signs that might be hiding in the
-                                              // provided credentials so PHP doesn't mistake them for variables
+    $creds = str_replace(['$', '"'], ["\\$", "\\\""], $creds); // escaping any dollar signs/double quotes that might be hiding in the
+                                              // provided credentials so PHP doesn't mistake them for variables/end of strings
 	$dbconfigtxt = '<?php
 	//dbconfig.php - connects to database
 
@@ -41,7 +41,7 @@ if(!$failed){
 	$charset = "utf8mb4";
 
 	//CONNECT TO DATABASE
-	$dsn = "mysql:host=$dbhost;dbname=$dbname;charset=$charset";
+	$dsn = "mysql:host={$dbhost};dbname={$dbname};charset={$charset}";
 	$opt = [
 		PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
 		PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -63,9 +63,7 @@ if(!$failed){
 
 	try {
 		$cc->exec($sqlquery);
-	}
-	catch (PDOException $e)
-	{
+	} catch (PDOException $e) {
 		echo $e->getMessage();
 		die();
 	}
