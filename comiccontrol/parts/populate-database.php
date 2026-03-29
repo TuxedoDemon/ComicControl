@@ -18,6 +18,12 @@ $getRowCount = function (string $table) {
 
 // CREATE SITE SETTINGS
 
+if (($ccsite ?? null) === null) {
+    // if someone sends a request here for some reason, block it
+    http_response_code(403);
+    exit;
+}
+
 if ($ccsite->sitetitle === null) {
     $install = true;
     switch($reqmethod) {
