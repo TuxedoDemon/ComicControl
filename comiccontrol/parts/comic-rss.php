@@ -40,10 +40,12 @@ foreach($recent as $row) {
 	$desc_data = preg_replace("</html>", '', $desc_data);
 	$desc_data = preg_replace("</body>", '', $desc_data);
 
-    if ($desc_data !== "") {
-        $dom = new DOMDocument();
-        @$dom->loadHTML($desc_data);
+    if ($desc_data === "") {
+        $desc_data = "No news today!";
     }
+
+    $dom = new DOMDocument();
+    @$dom->loadHTML($desc_data);
 
     $str .= '<item><title><![CDATA[' . $ccpage->title . ' - ' . html_entity_decode($row['title'], ENT_QUOTES) . ']]></title>';
     
@@ -74,6 +76,7 @@ foreach($recent as $row) {
 	$str .= '<guid>' . $ccsite->root . $ccpage->module->slug . '/' . $row['slug'] . '</guid>';
 	$str .= '</item>';
 }
+
 $str .= '</channel></rss>';
 
 echo $str;

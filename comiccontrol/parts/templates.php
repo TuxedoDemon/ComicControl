@@ -9,7 +9,7 @@ if($ccuser->authlevel != 2){
 $template = $_POST['page-template'] ?? "";
 
 //if template was submitted, save the changes
-if($_SERVER['REQUEST_METHOD'] === "POST" && ($_POST['templatechange'] ?? "") !== ""){
+if(strtoupper($_SERVER['REQUEST_METHOD']) === "POST" && ($_POST['templatechange'] ?? "") !== ""){
 	
 	//save the changes to the file
 	if(file_put_contents('../templates/' . $_POST['templatechange'], $_POST['templatecontent'])){

@@ -7,6 +7,7 @@ function toSlug($input){
 	$input = trim($input);
 	$input = str_replace(' ','-',$input);
 	$input = strtolower($input);
+
 	return $input;
     
 }
@@ -20,18 +21,20 @@ function getSlug($slugnum){
 }
 
 //get file contents function
-function get_info($url){
+function get_info($url) {
 
 	$curl = curl_init();
 	curl_setopt($curl, CURLOPT_URL, $url);
 	curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 	$output = curl_exec($curl);
+    $check = new ReflectionFunction("curl_close");
+    !$check->isDeprecated() && curl_close($curl);
 	
 	return $output;
 
 }
 
-function get_file($url,$fileloc){
+function get_file($url, $fileloc) {
 
 	$file = fopen($fileloc, 'w');
 	$curl = curl_init();

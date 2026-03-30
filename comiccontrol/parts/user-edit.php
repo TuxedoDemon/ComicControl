@@ -39,7 +39,7 @@ else{
 	$thisuser = $stmt->fetch();
 
 	//submit page if posted
-	if(isset($_POST) && $_POST['user-username'] != ""){
+	if(strtoupper($_SERVER['REQUEST_METHOD']) === "POST" && ($_POST['user-username'] ?? "") !== ""){
 		
 		//set values for the query 
 		$avatar = "";
@@ -89,12 +89,21 @@ else{
 				}
 				$sessionhash =  sha1($username . $salt . $loginhash);
 				
+                $expires = time() + (432000);
+
 				//create the server-end hash and put it in the database if not already logged in
 				$stmt = $cc->prepare("INSERT INTO cc_" . $tableprefix . "sessions(userid, loginhash, loginexpire) VALUES(:userid,:loginhash,:expire)");
 				$stmt->execute(['userid' => $thisuser['id'], 'loginhash' => $sessionhash, 'expire' => time() + (432000) ]);
 				
-				setcookie('loginhash', $loginhash, time() + (432000), "/", $_SERVER['HTTP_HOST']);
-				setcookie('username', $username, time() + (432000), "/", $_SERVER['HTTP_HOST']);
+                $options = [
+                    "path" => "/",
+                    "expires" => $expires,
+                    "httponly" => true,
+                    "secure" => true,
+                ];
+
+                setcookie('loginhash', $loginhash, $options);
+                setcookie('username', $username, $options);
 				
 			}
 			
