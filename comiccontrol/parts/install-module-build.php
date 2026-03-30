@@ -1,32 +1,39 @@
 <?php
 
+if (($install ?? null) === null) {
+    http_response_code(403);
+    exit;
+}
+
+$pagetitle = htmlspecialchars($install['install-pagetitle']);
+
 //if it's a comic, just make the slug comic
-if($_POST['install-moduletype'] == "comic") $slugfinal = "comic";
-else{
+if($install['install-moduletype'] === "comic") {
+    $slugfinal = "comic";
+} else {
+    //find available slug
+    $slug = toSlug($install['install-pagetitle']);
 
-$_POST['install-pagetitle'] = htmlspecialchars($_POST['install-pagetitle']);
+    while(strpos($slug, '--') !== false){
+        $slug = str_replace('--','-',$slug);
+    }
 
-//find available slug
-$slug = toSlug($_POST['install-pagetitle']);
-while(strpos($slug, '--') !== false){
-	$slug = str_replace('--','-',$slug);
-}
-$stmt = $cc->prepare("SELECT * FROM cc_" . $tableprefix . "modules WHERE slug=:slug LIMIT 1");
-$stmt->execute(['slug' => $slug]);
-$count = 2;
-$slugfinal = $slug;
-while($stmt->fetch()){
-	$slugfinal = $slug . '-' . $count;
-	$stmt->execute(['slug' => $slugfinal]);
-	$count++;
-}
+    $stmt = $cc->prepare("SELECT * FROM cc_" . $tableprefix . "modules WHERE slug=:slug LIMIT 1");
+    $stmt->execute(['slug' => $slug]);
+    $count = 2;
+    $slugfinal = $slug;
+    while($stmt->fetch()){
+        $slugfinal = $slug . '-' . $count;
+        $stmt->execute(['slug' => $slugfinal]);
+        $count++;
+    }
 
 }
 
 //add the module to the database
 $query = "INSERT INTO cc_" . $tableprefix . "modules(title,moduletype,template,language,slug) VALUES(:title,:moduletype,:template,:language,:slug)";
 $stmt = $cc->prepare($query);
-$stmt->execute(['title' => $_POST['install-pagetitle'], 'moduletype' => $_POST['install-moduletype'], 'template' => $_POST['install-template'], 'language' => $_POST['install-language'],  'slug' => $slugfinal]);
+$stmt->execute(['title' => $pagetitle, 'moduletype' => $install['install-moduletype'], 'template' => $install['install-template'], 'language' => $install['install-language'],  'slug' => $slugfinal]);
 
 //get the new module id for adding options
 $moduleid = $cc->lastInsertId();

@@ -47,16 +47,19 @@ class CC_Site{
 
 		if($this->timezone == '') $this->timezone = "America/Chicago";
 	}
+
 	private function fetchoption($option){
 		global $cc;
 		
 		$stmt = $cc->prepare("SELECT * FROM cc_" . $this->tableprefix . "options WHERE optionname=:option LIMIT 1");
 		$stmt->execute(['option' => $option]);
 		$row = $stmt->fetch();
-		return $row['optionvalue'];
+		return ($row['optionvalue'] ?? null);
 	}
-	private function setProtocol($url){
-		$baseurl = substr($url,strpos($url,'/'));
+
+	private function setProtocol($url) {
+
+		$baseurl = substr(($url ?? ""), strpos(($url ?? ""), '/'));
 		$newurl = "";
 
 		if ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443) {

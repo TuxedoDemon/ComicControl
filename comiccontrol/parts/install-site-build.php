@@ -1,22 +1,27 @@
 <?php
 
+if (($install ?? null) === null) {
+    http_response_code(403);
+    exit;
+}
+
 $options = array();
 
-$options['timezone'] = $_POST['install-timezone'];
-$options['sitetitle'] = htmlspecialchars($_POST['install-sitetitle']);
-$options['commentname'] = $_POST['install-shortname'];
-$options['root'] = $_POST['install-siteroot'];
-$options['relativepath'] = $_POST['install-relativepath'];
-$options['dateformat'] = $_POST['install-dateformat'];
-$options['timeformat'] = $_POST['install-timeformat'];
-$options['ccroot'] = $_POST['install-ccpath'];
+$options['timezone'] = $install['install-timezone'];
+$options['sitetitle'] = htmlspecialchars($install['install-sitetitle']);
+$options['commentname'] = $install['install-shortname'];
+$options['root'] = $install['install-siteroot'];
+$options['relativepath'] = $install['install-relativepath'];
+$options['dateformat'] = $install['install-dateformat'];
+$options['timeformat'] = $install['install-timeformat'];
+$options['ccroot'] = $install['install-ccpath'];
 $options['version'] = "4.2.9";
-$options['language'] = $_POST['install-language'];
+$options['language'] = $install['install-language'];
 $options['jquery'] = "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js";
 $options['hammerjs'] = "https://ajax.googleapis.com/ajax/libs/hammerjs/2.0.8/hammer.min.js";
 $options['homepage'] = 1;
 $options['comments'] = "disqus";
-$options['description'] = htmlspecialchars($_POST['install-description']);
+$options['description'] = htmlspecialchars($install['install-description']);
 $options['updatechecked'] = 0;
 $options['newestversion'] = "4.2.9";
 
@@ -44,3 +49,4 @@ $root = $stmt->fetch();
 $htaccesstext = $prepend['content'] . PHP_EOL . $mainhtaccess['content'] . PHP_EOL . $append['content'];
 file_put_contents('../.htaccess', $htaccesstext);
 
+$ccsite = new CC_Site();

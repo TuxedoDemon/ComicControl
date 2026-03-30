@@ -22,9 +22,14 @@ if(!$configfile) {
         return;
         case "POST":
             if(isset($_POST['install-dbname']) && $_POST['install-dbname'] !== ""){
+                $install = $_POST;
                 require_once('parts/install-database-build.php');
                 // if the installation was unsuccessful, give the "install-database" form again. Else, set $configfile to true.
-                $failed ? require_once('parts/install-database.php') : $configfile = true;
+                if ($failed) {
+                    require_once('parts/install-database.php');
+                } else {
+                    $configfile = true;
+                }
             }
             // if there is no dbconfig file yet, do not load anything else beyond this point.
             if (!$configfile) return;

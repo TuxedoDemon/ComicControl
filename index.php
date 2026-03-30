@@ -1,6 +1,5 @@
 <?php
 
-
 /* 
 COMICCONTROL
 Version 4.2.9
@@ -17,7 +16,7 @@ error_reporting(E_ALL & ~E_NOTICE);
 header('X-Frame-Options: sameorigin');
 
 //include main ComicControl scripts
-require_once('comiccontrol/includes/dbconfig.php');
+file_exists('comiccontrol/includes/dbconfig.php') ? require_once('comiccontrol/includes/dbconfig.php') : exit;
 require_once('comiccontrol/includes/initialize.php');
 
 //build the page

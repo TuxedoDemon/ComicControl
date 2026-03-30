@@ -32,8 +32,9 @@ if ($ccsite->sitetitle === null) {
         return; // we are using returns throughout this instead of breaks so that when an installation form is included, the next one doesn't also get included.
         case "POST":
             if(isset($_POST['install-sitetitle']) && $_POST['install-sitetitle'] !== ""){
+                $install = $_POST;
                 require_once('parts/install-site-build.php');
-                ($ccsite->sitetitle !== null) ? $redirect() : require_once('parts/install-site.php');
+                ($ccsite->sitetitle) ? $redirect() : require_once('parts/install-site.php');
             }
         return;
         default:
@@ -55,6 +56,7 @@ if ($userCheck < 1) { // user check
         return;
         case "POST":
             if(isset($_POST['install-username']) && $_POST['install-username'] !== ""){
+                $install = $_POST;
                 require_once('parts/install-user-build.php');
                 ($getRowCount("users") >= 1) ? $redirect() : require_once('parts/install-user.php');
             }
@@ -77,6 +79,7 @@ if ($moduleCheck < 1) { // module check
         return;
         case "POST":			
             if(isset($_POST['install-pagetitle']) && $_POST['install-pagetitle'] != ""){
+                $install = $_POST;
                 require_once('parts/install-module-build.php');
                 if($getRowCount("modules") >= 1){
                     // if there's a variable indicating the installation is complete, give install complete message

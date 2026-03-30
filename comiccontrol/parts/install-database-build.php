@@ -1,27 +1,33 @@
 <?php
 
-$dbhost = $_POST['install-dbhost'];
-$dbname = $_POST['install-dbname'];
-$dbuser = $_POST['install-dbuser'];
-$dbpass = $_POST['install-dbpass'];
-$tableprefix = $_POST['install-tableprefix'];
+if (($install ?? null) === null) {
+    http_response_code(403);
+    exit;
+}
+
+$dbhost = $install['install-dbhost'];
+$dbname = $install['install-dbname'];
+$dbuser = $install['install-dbuser'];
+$dbpass = $install['install-dbpass'];
+$tableprefix = $install['install-tableprefix'];
 
 $charset = "utf8mb4";
 
 //CONNECT TO DATABASE
-$dsn = "mysql:host=$dbhost;dbname=$dbname;charset=$charset";
+$dsn = "mysql:host={$dbhost};dbname={$dbname};charset={$charset}";
 $opt = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     PDO::ATTR_EMULATE_PREPARES   => false,
 	PDO\Mysql::ATTR_FOUND_ROWS => true
 ];
+
 $failed = false;
+
 try {
     $pdotest = new PDO($dsn, $dbuser, $dbpass, $opt);
-}
-catch( PDOException $error ) {
-	print_r($error);
+} catch (PDOException $error) {
+	error_log($error);
     $failed = true;
 }
 

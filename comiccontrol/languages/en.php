@@ -464,7 +464,7 @@ $lang['passwordresetmessage1'] = "<h1>Your Password Reset Request</h1><p>A passw
 $lang['passwordresetmessage2'] = "<p>-ComicControl</p>";
 $lang['A password reset e-mail has been sent to your address.  Please follow the instructions in the e-mail to reset your password.'] = 'A password reset e-mail has been sent to your address.  Please follow the instructions in the e-mail to reset your password.';
 $lang['There was an error sending an e-mail to this address. Please try again.'] = 'There was an error sending an e-mail to this address. Please try again.';
-$lang['Your password has successfully been changed.  Click here to return to the login page.'] = 'Your password has successfully been changed.  Click <a href="' . $ccurl . '">here</a> to return to the login page.';
+$lang['Your password has successfully been changed.  Click here to return to the login page.'] = 'Your password has successfully been changed.  Click <a href="' . ($ccurl ?? "") . '">here</a> to return to the login page.';
 $lang['There was an error changing your password.  Please go back and try again.'] = 'There was an error changing your password.  Please go back and try again.';
 
 //template editor
@@ -493,7 +493,7 @@ $lang['To learn about installing and removing plugins, please read the ComicCont
 $lang['Your version of ComicControl needs updating! Click here to update your site!'] = 'Your version of ComicControl needs updating! Click here to update your site!';
 $lang['homemessage'] = "<p><b>Welcome to your ComicControl site!</b></p>
 		<p>Don't know where to begin? Don't worry, we've got you covered.</p>
-		<p>ComicControl allows you to manage your whole comic website, including multiple comics, blogs, galleries, and text pages.  If you haven't already, try <a href='" . $ccurl . "manage-modules/add-module'>creating a module</a> to get started.  If you've already set up your first comic module, try posting a page! If you're confused about an input, tap or hover over any &quot;?&quot;s you see to get more information about what you're doing.</p>
+		<p>ComicControl allows you to manage your whole comic website, including multiple comics, blogs, galleries, and text pages.  If you haven't already, try <a href='" . ($ccurl ?? ""). "manage-modules/add-module'>creating a module</a> to get started.  If you've already set up your first comic module, try posting a page! If you're confused about an input, tap or hover over any &quot;?&quot;s you see to get more information about what you're doing.</p>
 		<p>To learn more about how ComicControl works, check out the <a href='http://www.comicctrl.com/support' target='_blank'>ComicControl support page!</a></p>";
 $lang['Updates from @ComicCtrl'] = 'Updates from @ComicCtrl';
 $lang['Scheduled post calendar'] = 'Scheduled post calendar';
