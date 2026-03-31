@@ -4,13 +4,13 @@
 
 <?php
 
-if($ccuser->authlevel != 2){
+if($ccuser->authlevel !== 2){
 	echo '<div class="msg error f-c">' . $lang['You do not have permission to access this page.'] . '</div>';
 }else{
 $forminputs = array();
 
 //submit options if posted
-if(isset($_POST) && $_POST['sitetitle'] != ""){
+if($_SERVER['REQUEST_METHOD'] === "POST" && ($_POST['sitetitle'] ?? "") !== ""){
 
 	//get all the options associated with the module
 	$query = "SELECT * FROM cc_" . $tableprefix . "options";
@@ -51,7 +51,7 @@ if(isset($_POST) && $_POST['sitetitle'] != ""){
 	$ccsite = new CC_Site();
 	$ccuser = new CC_User();
 	date_default_timezone_set($ccsite->timezone);
-	$ccpage = new CC_Page("$_SERVER[REQUEST_URI]","admin");
+	$ccpage = new CC_Page($_SERVER["REQUEST_URI"],"admin");
 	
 	//output success message
 	echo '<div class="msg success f-c">' . $lang['changeoptions-success'] . '</div>';

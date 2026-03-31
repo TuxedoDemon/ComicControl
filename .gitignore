@@ -1,7 +1,7 @@
 dbconfig.php
 .htaccess
-comicsthumbs/*
 comicshighres/*
+comicsthumbs/*
 comics/*
 uploads/*
 upgrade.php

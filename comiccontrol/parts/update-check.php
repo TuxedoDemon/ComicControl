@@ -23,7 +23,7 @@ $row = $stmt->fetch();
 $currentversion = $row['optionvalue'];
 
 //if up to date, do nothing
-if($currentversion==$version){
+if($version === false || $currentversion === $version){
 	echo '<p>' . $lang['Your version of ComicControl is up to date!'] . '</p>';
 }
 
@@ -34,7 +34,7 @@ else{
 	$stmt = $cc->prepare($query);
 	$stmt->execute(['version' =>$version,'option'=>'newestversion']);
 	
-	get_file("https://www.comicctrl.com/version-control/upgradescripts/upgrade.txt",dirname(__FILE__) . '/upgrade.php');
+	get_file("https://www.comicctrl.com/version-control/upgradescripts/upgrade.txt", dirname(__FILE__) . '/upgrade.php');
 	echo '<p>' . $lang['Your version of ComicControl needs updating!  Here are change notes for this update:'] . '</p>';
 	$versionnotes = get_info("https://www.comicctrl.com/version-control/versionnotes.php?version=" . $currentversion);
 	echo '<p>' . $versionnotes . '</p>';

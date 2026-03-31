@@ -37,7 +37,7 @@ if(empty($thisstoryline)){
 else{
 	
 	//delete the storyline if confirmed
-	if(getSlug(5) == "confirmed"){
+	if($_SERVER['REQUEST_METHOD'] === "POST" && (getSlug(5) ?? "") === "confirmed"){
 	
 		$stmt = $cc->prepare("SELECT * FROM cc_" . $tableprefix . "comics_storyline WHERE parent=:parent");
 		$stmt->execute(['parent' => $thisstoryline['id']]);
@@ -45,7 +45,7 @@ else{
 		
 		//move the children up a level
 		foreach($children as $child){
-			$stmt = $cc->prepare("UPDATE cc_" . $tableprefix . "comics_storyline SET parent=:parent WHERE id=:id");
+			$stmt = $cc->prepare("UPDATE cc_" . $tableprefix . "comics_storyline SET parent=:parent, level=:level WHERE id=:id");
 			$stmt->execute(['parent' => $thisstoryline['parent'], 'level' => $thisstoryline['level'], 'id' => $child['id']]);
 		}
 		

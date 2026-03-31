@@ -47,16 +47,19 @@ class CC_Site{
 
 		if($this->timezone == '') $this->timezone = "America/Chicago";
 	}
+
 	private function fetchoption($option){
 		global $cc;
 		
 		$stmt = $cc->prepare("SELECT * FROM cc_" . $this->tableprefix . "options WHERE optionname=:option LIMIT 1");
 		$stmt->execute(['option' => $option]);
 		$row = $stmt->fetch();
-		return $row['optionvalue'];
+		return ($row['optionvalue'] ?? null);
 	}
-	private function setProtocol($url){
-		$baseurl = substr($url,strpos($url,'/'));
+
+	private function setProtocol($url) {
+
+		$baseurl = substr(($url ?? ""), strpos(($url ?? ""), '/'));
 		$newurl = "";
 
 		if ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443) {
@@ -87,7 +90,7 @@ class CC_User{
 		global $tableprefix;
 		
 		//handle case if user is trying to log in from comiccontrol/login.php
-		if(isset($_POST['username']))
+		if($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['username']))
 		{
 			
 			//assign inputs
@@ -118,7 +121,6 @@ class CC_User{
 		//if the user has a login cookie, check it
 		else if(isset($_COOKIE['username']) && isset($_COOKIE['loginhash'])){
 			
-			
 			//assign inputs
 			$loginhash = $_COOKIE['loginhash'];
 			$username = $_COOKIE['username'];
@@ -127,8 +129,8 @@ class CC_User{
 			$stmt = $cc->prepare("SELECT * FROM cc_" . $tableprefix . "users WHERE username=:username LIMIT 1");
 			$stmt->execute(['username' => $username]);
 			$userinfo = $stmt->fetch();
-			
-			if($userinfo['username'] != ""){
+
+			if(($userinfo['username'] ?? "") !== ""){
 				
 				//if user is found, check the loginhash against the database
 				$stmt = $cc->prepare("SELECT * FROM cc_" . $tableprefix . "sessions WHERE userid=:id AND loginhash=:loginhash LIMIT 1");
@@ -136,7 +138,7 @@ class CC_User{
 				$stmt->execute(['id' => $userinfo['id'], 'loginhash' => $sessionhash]);
 				$sessioninfo = $stmt->fetch();
 				
-				if($sessioninfo['loginhash'] != ""){
+				if(($sessioninfo['loginhash'] ?? "") !== ""){
 					
 					//if info checks out, log them in
 					$this->loginuser($userinfo,$loginhash,$sessionhash);
@@ -247,22 +249,22 @@ class CC_Page{
 		}
 		
 		//check if it's the index page
-		$this->isindex = (count($this->slugarr)==0) ? true : false;
-		if($this->slugarr[0] == "index.php") $this->isindex = true;
-		if((count($this->slugarr)==1) && $this->slugarr[0] == "") $this->isindex = true;
+		$this->isindex = (count($this->slugarr) === 0) ? true : false;
+		if(($this->slugarr[0] ?? "") === "index.php") $this->isindex = true;
+		if((count($this->slugarr) === 1) && ($this->slugarr[0] ?? "") === "") $this->isindex = true;
 		
 		//fill in variables based on what's in slugarr and who we're showing it to (admin or user)
 		if(!$this->isindex){
-			if($end == "admin"){
-				$this->slug = toSlug($this->slugarr[2]);
-				$this->subslug = toSlug($this->slugarr[3]);
+			if($end === "admin"){
+				$this->slug = toSlug($this->slugarr[2] ?? "");
+				$this->subslug = toSlug($this->slugarr[3] ?? "");
 			}else{
-				$this->slug = toSlug($this->slugarr[0]);
-				$this->subslug = toSlug($this->slugarr[1]);
-				if($this->subslug == "page") $this->pagenum = (ctype_digit($this->slugarr[2])) ? $this->slugarr[2] : 0;
-				if($this->subslug == "search"){ 
-					$this->searchterm = $this->slugarr[2];
-					$this->pagenum = (ctype_digit($this->slugarr[3])) ? $this->slugarr[3] : 0;
+				$this->slug = toSlug($this->slugarr[0] ?? "");
+				$this->subslug = toSlug($this->slugarr[1] ?? "");
+				if($this->subslug === "page") $this->pagenum = (ctype_digit($this->slugarr[2] ?? "")) ? $this->slugarr[2] : 0;
+				if($this->subslug === "search"){ 
+					$this->searchterm = $this->slugarr[2] ?? "";
+					$this->pagenum = (ctype_digit($this->slugarr[3] ?? "")) ? $this->slugarr[3] : 0;
 				}
 			}
 		}
@@ -282,7 +284,7 @@ class CC_Page{
 		}
 		
 		//if the page wasn't found, just get the main page
-		if($page['title'] == ""){
+		if(($page['title'] ?? "") === ""){
 			$stmt = $cc->prepare("SELECT * FROM cc_" . $ccsite->tableprefix . "options WHERE optionname='homepage' LIMIT 1");
 			$stmt->execute();
 			$mainpage = $stmt->fetch();
@@ -376,37 +378,29 @@ class CC_Page{
 		}
 		
 		//if there's extra info, add that to the title
-		if($this->moduletype == "comic" || ($this->moduletype == "blog" && $this->subslug != "")){
-			
+		if ($this->moduletype == "comic" || ($this->moduletype == "blog" && $this->subslug != "")) {
 			if(!$hyphen) echo ' - ';
-			
-			if($this->subslug == "archive"){
-				echo $user_lang['Archive'];
-			}
-			
-			else if($this->subslug == "search"){
-				echo $user_lang['Search'] . ' - ' . urldecode($this->searchterm);
-			}
-			
-			else if($this->subslug == "filter"){
-				echo urldecode($this->searchterm);
-			}
-			
-			else if($this->subslug == "page"){
-				echo str_replace('%n', $this->pagenum, $user_lang['Page %n']);
-			}
-			
-			//if slug is assigned, get comic or blog title
-			else{
-				if($this -> isindex){
-					$post = $this->module->getSeq("last");
-				}else{
-					$post = $this->module->getPost($this->subslug);
-				}
-				echo $post['title'];
-			}
+			switch ($this->subslug) {
+                case "archive":
+                    echo $user_lang['Archive'];
+                break;
+                case "search":
+                    echo $user_lang['Search'] . ' - ' . urldecode($this->searchterm);
+                break;
+                case "filter":
+                    echo urldecode($this->searchterm);
+                break;
+                case "page":
+                    echo str_replace('%n', $this->pagenum, $user_lang['Page %n']);
+                break;
+                default:
+                    //if slug is assigned, get comic or blog title
+                    $post = $this->isindex ? $this->module->getSeq("last") : $this->module->getPost($this->subslug);
+                    echo $post['title'] ?? "";
+            }
 		}
 	}
+
 	public function displayMeta(){
 		
 		global $ccsite;
@@ -577,7 +571,7 @@ class CC_Comic extends CC_Module{
 		
 		echo '<div id="cc-comicbody">';
 		
-		if($comic['title'] != ""){
+		if(($comic['title'] ?? "") !== ""){
 		
 			//handle displaying swf comics
 			if($comic['mime'] == "application/x-shockwave-flash"){
@@ -589,10 +583,10 @@ class CC_Comic extends CC_Module{
 			//handle case for everything else and display comic
 			else{
 				$tagadd = "";
-				if($ccpage->slugarr[2] == "read-tag") $tagadd = "/read-tag/" . $ccpage->slugarr[3];
+				if(($ccpage->slugarr[2] ?? "") === "read-tag") $tagadd = "/read-tag/" . $ccpage->slugarr[3];
 				
 				//link to the next page if available
-				if($comic != $this->getSeq("last") && $comic['altnext'] == ""){
+				if($comic !== $this->getSeq("last") && $comic['altnext'] === ""){
 					$nextcomic = $this->getSeq("next");
 					echo '<a href="' . $ccsite->root . $this->slug . '/' . $nextcomic['slug'] . $tagadd . '">';
 				}
@@ -707,7 +701,7 @@ class CC_Comic extends CC_Module{
 
 				//check to add tag reading portion of URL
 				$tagadd = "";
-				if($ccpage->slugarr[2] == "read-tag"){
+				if(($ccpage->slugarr[2] ?? "") === "read-tag"){
 					$tagadd = "/read-tag/" . $ccpage->slugarr[3];
 				}
 
@@ -803,7 +797,7 @@ class CC_Comic extends CC_Module{
 			$queryadd = " AND publishtime < " . time();
 		}
 
-		if($ccpage->slugarr[2] == "read-tag"){
+		if(($ccpage->slugarr[2] ?? "") === "read-tag"){
 
 			//get all entries of comics with that tag
 			$query = "SELECT comicid FROM cc_" . $tableprefix . "comics_tags WHERE comic=:comic AND tag=:tag";
@@ -910,11 +904,11 @@ class CC_Comic extends CC_Module{
 		//get the current comic
 		$currentcomic = $this->getComic();
 		$tagadd = "";
-		if($ccpage->slugarr[2] == "read-tag"){
+		if(($ccpage->slugarr[2] ?? "") === "read-tag"){
 			$tagadd = "/read-tag/" . $ccpage->slugarr[3];
 		}
 		
-		if($currentcomic['title'] != ""){
+		if(($currentcomic['title'] ?? "") !== ""){
 		
 			//get the first and last comic
 			$firstcomic = $this->getSeq("first");
@@ -1011,7 +1005,7 @@ class CC_Comic extends CC_Module{
 		//get current comic row
 		$news = $this->getComic();
 		
-		if($news['title'] != ""){
+		if(($news['title'] ?? "") !== ""){
 		
 			//if they only want the latest relevant news, go back and get most recent filled out news post
 			if($this->options['newsmode'] == "latestnews"){
@@ -1056,7 +1050,7 @@ class CC_Comic extends CC_Module{
 		//get the current comic
 		$comic = $this->getComic();
 		
-		if($comic['title'] != ""){
+		if(($comic['title'] ?? "") !== ""){
 			
 			//find all the associated tags in the database
 			$query = "SELECT DISTINCT tag FROM cc_" . $tableprefix . "comics_tags WHERE comicid=:comicid";
@@ -1120,7 +1114,7 @@ class CC_Comic extends CC_Module{
 		//get the current comic
 		$comic = $this->getComic();
 		
-		if($comic['title'] != ""){
+		if(($comic['title'] ?? "") !== ""){
 			
 			//if it's the index, don't display the comments, just display the comments link
 			if($ccpage->isindex){
@@ -1272,7 +1266,7 @@ class CC_Comic extends CC_Module{
 					}
 				
 					//display the chapter name
-					$stmt->execute(['storyline' => $arr['id']]);
+					$stmt->execute(['storyline' => $arr['id'], 'comic' => $this->id]);
 					$pages = $stmt->fetchAll();
 					echo '<div class="cc-storyline-text"><div class="cc-storyline-header"><a href="' . $ccsite->root . $this->slug . '/' . $firstpage['slug'] . '">' . 
 					$arr['name'] . '</a></div>';
@@ -1458,7 +1452,7 @@ class CC_Gallery extends CC_Module{
 		$images = $stmt->fetchAll();
 		
 		//output the images
-		if($images[0]['imgname'] != ""){
+		if(($images[0]['imgname'] ?? "") !== ""){
 			foreach($images as $image){
 				echo '<a href="' . $ccsite->root . 'uploads/' . $image['imgname'] . '" data-lightbox="' . $ccpage->title . '" data-title="<div class=\'customHtml\'>' . str_replace('"','&quot;',$image['caption']) . '</div>"><img src="' . $ccsite->root . 'uploads/' . $image['thumbname'] . '" /></a>';
 			}
@@ -1553,11 +1547,11 @@ class CC_Blog extends CC_Module{
 			
 			//do some math
 			$numposts = count($allposts);
-			$posts = array_slice($allposts,$lowerlimit,$this->options['perpage']);
+			$posts = array_slice($allposts, $lowerlimit, $this->options['perpage']);
 			$numpages = ceil($numposts / $this->options['perpage']);
 			
 			//display posts and nav based on the created post array
-			if(is_array($posts[0])){
+			if(is_array($posts[0] ?? null)){
 				if($ccpage->subslug == "search") echo '<div class="cc-searchheader">' . str_replace('%s',urldecode($ccpage->searchterm), $user_lang['Posts tagged with "%s"']) . ' - ' . str_replace('%n', $page, $user_lang['Page %n']) . '</div>';
 				$this->displayPosts($posts);
 				$this->getPageNav($numpages);
@@ -1609,7 +1603,7 @@ class CC_Blog extends CC_Module{
 		//get the post
 		$post = $this->getPost($slug);
 		
-		if($post['title'] != ""){
+		if(($post['title'] ?? "") !== ""){
 			
 			//output the post
 			echo '<article class="cc-blogpost">';

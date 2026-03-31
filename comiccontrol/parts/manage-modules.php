@@ -54,7 +54,7 @@ if($action == "add-module"){
 	echo '<main id="content">';
 	
 	//add the module if submitted
-	if(isset($_POST) && $_POST['title'] != ""){
+	if($_SERVER['REQUEST_METHOD'] === "POST" && ($_POST['title'] ?? "") !== ""){
 		
 		//find available slug
 		$slug = toSlug($_POST['title']);
@@ -85,27 +85,28 @@ if($action == "add-module"){
 		switch($_POST['moduletype']){
 			case 'comic':
 				$option['displaytags'] = "on";
-				$option['newsmode'] = "eachpost";
-				$option['clickaction'] = "next";
-				$option['comicwidth'] = 900;
-				$option['navaux'] = "rss";
-				$option['thumbwidth'] = 200;
-				$option['thumbheight'] = 200;
-				$option['touchaction'] = "hovertext";
-				$option['navorder'] = "first|prev|aux|next|last";
-				$option['perpage'] = 15;
-				$option['displaytranscript'] = "off";
-				$option['displaycomments'] = "on";
-				$option['contentwarnings'] = "off";
-				$option['chapterthumbs'] = "on";
-				$option['pagethumbs'] = "off";
-				$option['pagetitles'] = "off";
-				$option['transcriptclick'] = "on";
-				$option['firsttext'] = "";
-				$option['prevtext'] = "";
-				$option['nexttext'] = "";
-				$option['lasttext'] = "";
-				$option['auxtext'] = "";
+                $option['newsmode'] = "eachpost";
+                $option['clickaction'] = "next";
+                $option['comicwidth'] = 900;
+                $option['navaux'] = "rss";
+                $option['thumbwidth'] = 200;
+                $option['thumbheight'] = 200;
+                $option['touchaction'] = "hovertext";
+                $option['navorder'] = "first|prev|aux|next|last";
+                $option['perpage'] = 15;
+                $option['displaytranscript'] = "off";
+                $option['displaycomments'] = "on";
+                $option['contentwarnings'] = "off";
+                $option['chapterthumbs'] = "on";
+                $option['pagethumbs'] = "off";
+                $option['pagetitles'] = "off";
+                $option['transcriptclick'] = "on";
+                $option['firsttext'] = "";
+                $option['prevtext'] = "";
+                $option['nexttext'] = "";
+                $option['lasttext'] = "";
+                $option['auxtext'] = "";
+                $option['arrowkey'] = "off";
 				break;
 			case 'blog':
 				$option['perpage'] = 10;
@@ -130,7 +131,7 @@ if($action == "add-module"){
 			$stmt->execute(['moduleid' => $moduleid, 'optionname' => $optionname, 'value' => $value]);
 		}
 		
-		if($_POST['moduletype'] == "text" || $_POST['moduletype'] == "gallery"){
+		if($_POST['moduletype'] === "text" || $_POST['moduletype'] === "gallery"){
 			//if text module or gallery module, add to text table
 			$query = "INSERT INTO cc_" . $tableprefix . "text(id,content) VALUES(:id,'')";
 			$stmt = $cc->prepare($query);

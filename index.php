@@ -1,6 +1,5 @@
 <?php
 
-
 /* 
 COMICCONTROL
 Version 4.2.9
@@ -17,7 +16,7 @@ error_reporting(E_ALL & ~E_NOTICE);
 header('X-Frame-Options: sameorigin');
 
 //include main ComicControl scripts
-require_once('comiccontrol/includes/dbconfig.php');
+file_exists('comiccontrol/includes/dbconfig.php') ? require_once('comiccontrol/includes/dbconfig.php') : exit;
 require_once('comiccontrol/includes/initialize.php');
 
 //build the page
@@ -59,12 +58,18 @@ if($ccuser->authlevel > 0){
 	
 	switch($ccpage->moduletype){
 		case "comic":
-			$comicinfo = $ccpage->module->getComic();
-			if($comicinfo['publishtime'] > time()){
-				$previewbar .= $adminlang['PREVIEW'] . " - ";
-			}
-			$previewbar .= $comicinfo['comicname'] .'<a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '/add-post">' . $adminlang['Add'] . '</a> | <a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '/edit-post/' . $comicinfo['slug'] . '">' . $adminlang['Edit'] . '</a> | ';
-			$previewbar .= '<a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '">' . str_replace('%s',$ccpage->title,$adminlang['Return to %s']) . '</a>';
+            if($ccpage->slug === "archive"){
+                $previewbar .= $ccpage->module->name .' - <a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '/add-post">' . $adminlang['Add'] . '</a> | ';
+            }else {
+                $comicinfo = $ccpage->module->getComic();
+                if($comicinfo){
+                    if ($comicinfo['publishtime'] > time()) $previewbar .= $adminlang['PREVIEW'] . " - ";
+                    $previewbar .= $ccpage->module->name .' - <a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '/add-post">' . $adminlang['Add'] . '</a> | <a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '/edit-post/' . $comicinfo['slug'] . '">' . $adminlang['Edit'] . '</a> | ';
+                }else{
+                    $previewbar .= $ccpage->module->name .' - <a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '/add-post">' . $adminlang['Add'] . '</a> | ';
+                }
+            }
+            $previewbar .= '<a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '">' . str_replace('%s',$ccpage->title,$adminlang['Return to %s']) . '</a>';
 			$previewbar .= '</div></div>';
 			break;
 		case "blog":
@@ -74,7 +79,7 @@ if($ccuser->authlevel > 0){
 					$previewbar .= $adminlang['PREVIEW'] . " - ";
 				}
 				$previewbar .= $bloginfo['title'] . ' - ';
-				$previewbar .= $bloginfo['comicname'] .'<a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '/edit-post/' . $bloginfo['slug'] . '">' . $adminlang['Edit'] . '</a> | ';
+				$previewbar .= $ccpage->module->name .' - <a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '/edit-post/' . $bloginfo['slug'] . '">' . $adminlang['Edit'] . '</a> | ';
 			}
 			$previewbar .= '<a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '/add-post">' . $adminlang['Add'] . '</a> | ';
 			$previewbar .= '<a href="' . $ccurl . 'modules/' . $ccpage->module->slug . '">' . str_replace('%s',$ccpage->title,$adminlang['Return to %s']) . '</a>';

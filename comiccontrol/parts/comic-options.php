@@ -6,7 +6,7 @@
 $forminputs = array();
 
 //submit options if posted
-if(isset($_POST) && $_POST['page-title'] != ""){
+if($_SERVER['REQUEST_METHOD'] === "POST" && ($_POST['page-title'] ?? "") !== ""){
 
 	//save general modules options
 	require_once('save-options.php');
@@ -25,7 +25,7 @@ if(isset($_POST) && $_POST['page-title'] != ""){
 			$navorder .= $_POST[$navname];
 		}
 	}
-	$stmt->execute(['value' => $navorder, 'optionname' => 'navorder']);
+	$stmt->execute(['value' => $navorder, 'optionname' => 'navorder', 'moduleid' => $ccpage->module->id]);
 	
 	//rebuild the module so options are updated
 	$ccpage = new CC_Page("$_SERVER[REQUEST_URI]","admin");
@@ -130,6 +130,7 @@ echo '<h2 class="formheader">' . $lang['Comic display options'] . '</h2>';
 buildForm($forminputs);
 
 //build comic navigation options
+
 $forminputs = array(
 	array(
 		array(

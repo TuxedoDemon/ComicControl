@@ -22,9 +22,14 @@ if(!$configfile) {
         return;
         case "POST":
             if(isset($_POST['install-dbname']) && $_POST['install-dbname'] !== ""){
+                $install = $_POST;
                 require_once('parts/install-database-build.php');
                 // if the installation was unsuccessful, give the "install-database" form again. Else, set $configfile to true.
-                $failed ? require_once('parts/install-database.php') : $configfile = true;
+                if ($failed) {
+                    require_once('parts/install-database.php');
+                } else {
+                    $configfile = true;
+                }
             }
             // if there is no dbconfig file yet, do not load anything else beyond this point.
             if (!$configfile) return;
@@ -59,7 +64,7 @@ $ccpage = new CC_Page($_SERVER["REQUEST_URI"], "admin");
 
 // delete cookies and session if logout requested, but only if the user is actually logged in at all.
 // TODO: Move this into the CC_User class and make it into a dedicated "logout" method. Probably also refactor the user class.
-if ($ccuser->authlevel > 0 && $ccpage->slugarr[1] === "logout") {
+if ($ccuser->authlevel > 0 && ($ccpage->slugarr[1] ?? "") === "logout") {
     $stmt = $cc->prepare("SELECT * FROM cc_" . $tableprefix . "users WHERE username=:username LIMIT 1");
     $stmt->execute(['username' => $ccuser->username]);
     $userinfo = $stmt->fetch();
@@ -90,6 +95,7 @@ $links = array();
 require_once('includes/header.php');
 
 //include login or password reset for non-authorized user
+
 if ($ccuser->authlevel === 0) {
     if ($navslug === "password-reset") {
         require_once('parts/password-reset.php');

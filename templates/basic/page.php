@@ -1,6 +1,11 @@
 <?php
-include('templates/basic/includes/header.php'); ?>
+if ($ccpage->module->type === "blog" && $ccpage->subslug === "rss") {
+    include($ccsite->ccroot . 'parts/blog-rss.php');
+    return;
+}
 
-<?php $ccpage->module->display(); ?>
+include('templates/basic/includes/header.php');
 
-<?php include('templates/basic/includes/footer.php'); ?>
+$ccpage->module->display();
+
+include('templates/basic/includes/footer.php');

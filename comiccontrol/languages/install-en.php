@@ -5,7 +5,7 @@ $ilang['dbbuilderror'] = "There was an error trying to connect to the database w
 $ilang['secondstep'] = "<p>Great. Now that we have a database connection established, we can get started on creating your site.  We've filled as much as we can automatically, but we need a little more information to finish creating your new website.</p>";
 $ilang['thirdstep'] = "<p>Awesome! Your site's halfway there.  The next thing you'll need is to create an administrative user to manage the site.</p>";
 $ilang['fourthstep'] = "<p>Almost there! To finish your site, you'll need to create your first module. This module will be your homepage to start, but you can change this later in your site options.</p>";
-$ilang['complete'] = "<p>Congratulations! You've finished installing ComicControl and you're ready to start managing your new comic website.  To log in, simply go to <a href='" . $ccurl . "'>" . $ccurl . "</a>. For more help on using ComicControl, check out the <a href='http://comicctrl.com/support'>ComicControl support page</a> for more info!</p>";
+$ilang['complete'] = "<p>Congratulations! You've finished installing ComicControl and you're ready to start managing your new comic website.  To log in, simply go to <a href='" . ($ccurl ?? ""). "'>" . ($ccurl ?? ""). "</a>. For more help on using ComicControl, check out the <a href='http://comicctrl.com/support'>ComicControl support page</a> for more info!</p>";
 
 $ilang['next'] = "Next &gt;";
 $ilang['error-prefix'] = "This prefix must be no more than 7 characters in length, made up of only letters, numbers, and underscores. It cannot be blank.";

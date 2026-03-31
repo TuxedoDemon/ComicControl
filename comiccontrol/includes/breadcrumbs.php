@@ -101,7 +101,7 @@
 					echo '<a href="' . $ccurl .'">' . $lang['Home'] . '</a>';
 					break;
 			}
-			
+
 			//output the action title if one is selected
 			if(getSlug(2) != "" && getSlug(1) != "plugins"){
 				if(getSlug(4) != "confirmed") echo '</div><div style="display:inline-block; line-height:50px;"><i class="fa fa-caret-right"></i></div><div class="header-block">';
@@ -119,7 +119,7 @@
 						echo $lang['Manage Permissions'];
 						break;
 					case "add-module":
-						if(!isset($_POST) || $_POST['title'] == "") echo $lang['Add a module'];
+						if(($_POST['title'] ?? "") === "") echo $lang['Add a module'];
 						break;
 					case "delete-module":
 						if(getSlug(4) != "confirmed") echo $lang['Delete module'];

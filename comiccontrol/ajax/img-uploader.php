@@ -6,8 +6,7 @@ require_once('../includes/dbconfig.php');
 require_once('../includes/initialize.php');
 
 //up the memory limit so images can be resized
-ini_set('memory_limit', '128M' );
-
+ini_set('memory_limit', '128M');
 //only allow the script to be used if the user is authorized
 if($ccuser->authlevel > 0){
 	
@@ -15,26 +14,21 @@ if($ccuser->authlevel > 0){
 	$iscomic = false;
 	$isgallery = false;
 	$isavatar = false;
-	$serveruri = $_POST['serveruri'];
-	
-	$ccpage = new CC_Page($serveruri,"admin");
-	
-	if(getSlug(1) == "modules"){
-		if($ccpage->module->type == "comic") $iscomic = true;
-		if($ccpage->module->type == "gallery") $isgallery = true;
-	}
-	if(getSlug(1) == "users") $isavatar = true;
-		
-	//generic function for uploading images and returning info
-	function uploadImage($tmpimage,$uploadsDirectory,$filename,$returnData,$maxw,$maxh,$returnkey){
 
-		if(!($source = imagecreatefromstring(file_get_contents($tmpimage)))){
+    //generic function for uploading images and returning info
+	function uploadImage($tmpimage, $uploadsDirectory, $filename, $returnData, $maxw, $maxh, $returnkey){
+
+		if(!file_exists($tmpimage)){
 			$returnData['error'] = 1;
+            exit;
 		}else{
-				
+			$source = @imagecreatefromstring(file_get_contents($tmpimage)); // if the file contains a bad sRGB profile, this will yell about it. 
+                                                                        // There's nothing you can do to fix it, so silence it.
 			//get image type
-			$type = strtolower(substr(strrchr($filename,"."),1));
-			
+			$type = strtolower(substr(strrchr($filename,"."), 1));
+			$filename = str_replace(" ", "-", $filename);
+            $filename = strip_tags($filename);
+
 			//find an available filename
 			$now = time();
 			while(file_exists($uploadFilename = $uploadsDirectory.$now.'-'.$filename))
@@ -54,16 +48,16 @@ if($ccuser->authlevel > 0){
 			}else{
 				if(($x/$maxw) >= ($y/$maxh)){
 					$w = $maxw;
-					$h = ($y/$x) * $w;
+					$h = (int)round(($y/$x) * $w);
 				}else{
 					$h = $maxh;
-					$w = ($x/$y) * $h;
+					$w = (int)round(($x/$y) * $h);
 				}
 			}
 			
 			//if not bigger than restraints, just copy
-			if($x == $w && $h == $y){
-				copy($tmpimage,$uploadFilename);
+			if($x === $w && $h === $y){
+				copy($tmpimage, $uploadFilename);
 				$returnData['copied'] = "true";
 				$returnData[$returnkey] = $finalfile;
 			}else{
@@ -71,7 +65,7 @@ if($ccuser->authlevel > 0){
 				//resize image and move file to new location
 				if(!($slate = imagecreatetruecolor($w, $h))) $returnData['error'] = 1;
 				else{
-					if($type == "gif" or $type == "png"){
+					if(in_array($type, ["gif", "png", "webp"])){
 						imagecolortransparent($slate, imagecolorallocatealpha($slate, 0, 0, 0, 127));
 						imagealphablending($slate, false);
 						imagesavealpha($slate, true);
@@ -81,10 +75,12 @@ if($ccuser->authlevel > 0){
 						case 'bmp': imagewbmp($slate, $uploadFilename); break;
 						case 'gif': imagegif($slate, $uploadFilename); break;
 						case 'jpg': imagejpeg($slate, $uploadFilename, 100); break;
+                        case 'jpeg': imagejpeg($slate, $uploadFilename, 100); break;
 						case 'png': imagepng($slate, $uploadFilename, 9); break;
+                        case 'webp': imagewebp($slate, $uploadFilename, 100); break;
 					}
 					$returnData[$returnkey] = $finalfile;
-					imagedestroy($slate);
+					unset($slate);
 				}
 			}
 				
@@ -92,7 +88,22 @@ if($ccuser->authlevel > 0){
 		return $returnData;
 		
 	}	
+
+    if($_SERVER['REQUEST_METHOD'] === "POST" && ($_POST['serveruri'] ?? "") === "") {
+        echo \json_encode(uploadImage("error.no", "cc-error", "error.no", [], 0, 0, "error"));
+        exit;
+    }
+
+	$serveruri = $_POST['serveruri'];
+	$ccpage = new CC_Page($serveruri,"admin");
 	
+	if (getSlug(1) === "modules") {
+		if($ccpage->module->type === "comic") $iscomic = true;
+		if($ccpage->module->type === "gallery") $isgallery = true;
+	}
+
+	if (getSlug(1) === "users") $isavatar = true;
+		
 	//create return data array
 	$returnData = array();
 	$returnData['error'] = 0;

@@ -23,12 +23,12 @@ quickLinks($links);
 $forminputs = array();
 
 //submit options if posted
-if(isset($_POST) && $_POST['page-title'] != ""){
+if($_SERVER['REQUEST_METHOD'] === "POST" && ($_POST['page-title'] ?? "") !== ""){
 
 	require_once('save-options.php');
 	
 	//rebuild module so correct options display
-	$ccpage = new CC_Page("$_SERVER[REQUEST_URI]","admin");
+	$ccpage = new CC_Page($_SERVER['REQUEST_URI'], "admin");
 	
 	//output success message
 	echo '<div class="msg success f-c">' . $lang['changeoptions-success'] . '</div>';
