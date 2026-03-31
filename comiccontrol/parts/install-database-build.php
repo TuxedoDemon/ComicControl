@@ -33,7 +33,7 @@ try {
 if (!$failed) {
 
 	$creds = [$dbhost, $dbname, $dbuser, $dbpass];
-    $tableprefix = str_replace(['$', '"'], ["\\$", "\\\""], $creds);
+    $tableprefix = str_replace(['$', '"'], ["\\$", "\\\""], $tableprefix);
     $creds = str_replace(['$', '"'], ["\\$", "\\\""], $creds); // escaping any dollar signs/double quotes that might be hiding in the
                                               // provided credentials so PHP doesn't mistake them for variables/ends of strings
 	$dbconfigtxt = '<?php
