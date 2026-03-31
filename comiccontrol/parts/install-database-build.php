@@ -10,7 +10,6 @@ $dbname = $install['install-dbname'];
 $dbuser = $install['install-dbuser'];
 $dbpass = $install['install-dbpass'];
 $tableprefix = $install['install-tableprefix'];
-
 $charset = "utf8mb4";
 
 //CONNECT TO DATABASE
@@ -31,11 +30,12 @@ try {
     $failed = true;
 }
 
-if(!$failed){
+if (!$failed) {
 
 	$creds = [$dbhost, $dbname, $dbuser, $dbpass];
+    $tableprefix = str_replace(['$', '"'], ["\\$", "\\\""], $creds);
     $creds = str_replace(['$', '"'], ["\\$", "\\\""], $creds); // escaping any dollar signs/double quotes that might be hiding in the
-                                              // provided credentials so PHP doesn't mistake them for variables/end of strings
+                                              // provided credentials so PHP doesn't mistake them for variables/ends of strings
 	$dbconfigtxt = '<?php
 	//dbconfig.php - connects to database
 
@@ -54,6 +54,7 @@ if(!$failed){
 		PDO::ATTR_EMULATE_PREPARES   => false,
 		PDO\Mysql::ATTR_FOUND_ROWS => true
 	];
+
 	$cc = new PDO($dsn, $dbuser, $dbpass, $opt);
 	$tableprefix = "' . $tableprefix . '";
     ';

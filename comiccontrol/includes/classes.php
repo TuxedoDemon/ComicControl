@@ -263,7 +263,7 @@ class CC_Page{
 				$this->subslug = toSlug($this->slugarr[1] ?? "");
 				if($this->subslug === "page") $this->pagenum = (ctype_digit($this->slugarr[2] ?? "")) ? $this->slugarr[2] : 0;
 				if($this->subslug === "search"){ 
-					$this->searchterm = $this->slugarr[2];
+					$this->searchterm = $this->slugarr[2] ?? "";
 					$this->pagenum = (ctype_digit($this->slugarr[3] ?? "")) ? $this->slugarr[3] : 0;
 				}
 			}
@@ -1547,11 +1547,11 @@ class CC_Blog extends CC_Module{
 			
 			//do some math
 			$numposts = count($allposts);
-			$posts = array_slice($allposts,$lowerlimit,$this->options['perpage']);
+			$posts = array_slice($allposts, $lowerlimit, $this->options['perpage']);
 			$numpages = ceil($numposts / $this->options['perpage']);
 			
 			//display posts and nav based on the created post array
-			if(is_array($posts[0])){
+			if(is_array($posts[0] ?? null)){
 				if($ccpage->subslug == "search") echo '<div class="cc-searchheader">' . str_replace('%s',urldecode($ccpage->searchterm), $user_lang['Posts tagged with "%s"']) . ' - ' . str_replace('%n', $page, $user_lang['Page %n']) . '</div>';
 				$this->displayPosts($posts);
 				$this->getPageNav($numpages);

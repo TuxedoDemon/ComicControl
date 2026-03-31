@@ -4,12 +4,17 @@ header("Content-Type: application/xml; charset=UTF-8");
 
 //some cleanup functions
 function selfURL() {
+
     $s = (empty($_SERVER["HTTPS"]) ? '' : ($_SERVER["HTTPS"] == "on")) ? "s" : "";
 	$protocol = strleft(strtolower($_SERVER["SERVER_PROTOCOL"]), "/").$s;
 	return $protocol."://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
+
 }
+
 function strleft($s1, $s2) {
+
 	return substr($s1, 0, strpos($s1, $s2));
+
 }
 
 //start building xml
@@ -26,6 +31,7 @@ $query = "SELECT * FROM cc_" . $tableprefix . "blogs WHERE blog=:id AND publisht
 $stmt = $cc->prepare($query);
 $stmt->execute(['id' => $ccpage->module->id]);
 $recent = $stmt->fetchAll();
+
 foreach($recent as $row){
 	$str .= '<item><title><![CDATA[' . $ccpage->title . ' - ' . html_entity_decode($row['title'],ENT_QUOTES) . ']]></title>';
 	$desc_data = $row['content'];
@@ -46,6 +52,7 @@ foreach($recent as $row){
 				->item($i)
 				->setAttribute('src',$encoded);
 	}
+
 	$desc_data = $dom->saveHTML();
 	$desc_data = str_replace("<html>", '', $desc_data);
 	$desc_data = str_replace("<body>", '', $desc_data);
