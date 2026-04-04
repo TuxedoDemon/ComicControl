@@ -45,7 +45,7 @@ if($action == "validate"){
 		else{
 			
 			//if the form was submitted, reset the password
-			if(isset($_POST) && $_POST['user-password'] != ""){
+			if($_SERVER['REQUEST_METHOD'] === "POST" && ($_POST['user-password'] ?? "") !== ""){
 				
 				//create the password hash
 				$password = md5($_POST['user-password'].$thisuser['salt']);
@@ -166,7 +166,7 @@ if($action == "validate"){
 else{
 	
 	//if the e-mail form was submitted, create validation key and send e-mail to user
-	if(isset($_POST) && $_POST['user-email']){
+	if($_SERVER['REQUEST_METHOD'] === "POST" && ($_POST['user-email'] ?? "") !== ""){
 		
 		//check to make sure the e-mail exists
 		$query = "SELECT * FROM cc_" . $tableprefix . "users WHERE email=:email LIMIT 1";
