@@ -97,11 +97,8 @@ require_once('includes/header.php');
 //include login or password reset for non-authorized user
 
 if ($ccuser->authlevel === 0) {
-    if ($navslug === "password-reset") {
-        require_once('parts/password-reset.php');
-        return;
-    }
-    require_once('parts/login.php');
+    ($navslug === "password-reset") ? require_once('parts/password-reset.php') : require_once('parts/login.php');
+    require_once('includes/footer.php');
     return;
 }
 
